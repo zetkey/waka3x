@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/mocks"
-	"github.com/muety/wakapi/models"
-	routeutils "github.com/muety/wakapi/routes/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
 )
 
 func TestAuthenticateMiddleware_tryGetUserByApiKeyHeader_Success(t *testing.T) {

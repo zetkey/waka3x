@@ -10,12 +10,12 @@ import (
 	"github.com/duke-git/lancet/v2/slice"
 	"github.com/gofrs/uuid/v5"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/models"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/models"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/utils"
 )
 
 const (
@@ -191,7 +191,7 @@ func (m *AuthenticateMiddleware) tryGetUserByTrustedHeader(r *http.Request, crea
 		return nil, err
 	}
 
-	// register new user solely based on upstream provided username (see https://github.com/muety/wakapi/issues/808)
+	// register new user solely based on upstream provided username (see https://github.com/zetkey/waka3x/issues/808)
 	signup := &models.Signup{
 		Username: remoteUser,
 		Password: uuid.Must(uuid.NewV4()).String(), // throwaway random string as password

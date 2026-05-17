@@ -1,4 +1,4 @@
-module github.com/muety/wakapi
+module github.com/zetkey/waka3x
 
 go 1.26
 

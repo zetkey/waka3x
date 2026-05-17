@@ -16,7 +16,7 @@ const docTemplate = `{
         },
         "license": {
             "name": "GPL-3.0",
-            "url": "https://github.com/muety/wakapi/blob/master/LICENSE"
+            "url": "https://github.com/zetkey/waka3x/blob/master/LICENSE"
         },
         "version": "{{.Version}}"
     },
@@ -1151,7 +1151,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "time": {
-                    "description": "note: on sqlite, table will have an additional column ` + "`" + `time_real` + "`" + `, introduced \"manually\" by migration 20260111\nsee https://github.com/muety/wakapi/issues/882 for details",
+                    "description": "note: on sqlite, table will have an additional column ` + "`" + `time_real` + "`" + `, introduced \"manually\" by migration 20260111\nsee https://github.com/zetkey/waka3x/issues/882 for details",
                     "type": "number"
                 },
                 "type": {

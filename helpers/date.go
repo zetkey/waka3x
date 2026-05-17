@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"fmt"
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 	"strings"
 	"time"
 )

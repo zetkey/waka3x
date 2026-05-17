@@ -15,13 +15,13 @@ import (
 	"github.com/go-chi/httprate"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/models/view"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/models/view"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/utils"
 )
 
 // TODO(oidc): tests (not only for oidc, but login in general)

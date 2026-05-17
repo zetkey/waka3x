@@ -43,7 +43,7 @@ target:
 Troubleshooting:
 ----------------
 - Check https://wiki.postgresql.org/wiki/Fixing_Sequences in case of errors with Postgres
-- Check https://github.com/muety/wakapi/pull/181#issue-621585477 on further details about Postgres migration
+- Check https://github.com/zetkey/waka3x/pull/181#issue-621585477 on further details about Postgres migration
 
 To Do:
 ------
@@ -61,9 +61,9 @@ import (
 
 	"github.com/glebarez/sqlite"
 	"github.com/jinzhu/configor"
-	wakapiConfig "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/repositories"
+	wakapiConfig "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/repositories"
 	"github.com/schollz/progressbar/v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"

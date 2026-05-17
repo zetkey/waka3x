@@ -1,19 +1,30 @@
+FROM --platform=$BUILDPLATFORM oven/bun:alpine AS frontend-build
+WORKDIR /frontend
+
+COPY ./frontend/package.json ./frontend/bun.lock ./
+RUN bun install --frozen-lockfile
+
+COPY ./frontend ./
+RUN bun run build
+
 FROM --platform=$BUILDPLATFORM golang:alpine AS build-env
 WORKDIR /src
 
 COPY ./go.mod ./go.sum ./
 RUN go mod download
+
 COPY . .
+COPY --from=frontend-build /frontend/dist ./frontend/dist
 
 ARG TARGETOS
 ARG TARGETARCH
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 GOEXPERIMENT=jsonv2 go build -ldflags "-s -w" -v -o wakapi main.go
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 GOEXPERIMENT=jsonv2 go build -ldflags "-s -w" -v -o waka3x main.go
 # Need a statically linked healthcheck binary because we can't use curl in a distroless image in a straightforward way
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build -ldflags "-s -w" -v -o healthcheck scripts/healthcheck.go
 
 WORKDIR /staging
 RUN mkdir ./data ./app && \
-    cp /src/wakapi app/ && \
+    cp /src/waka3x app/ && \
     cp /src/healthcheck app/ && \
     cp /src/config.default.yml app/config.yml && \
     sed -i 's/listen_ipv6: ::1/listen_ipv6: "-"/g' app/config.yml
@@ -33,23 +44,23 @@ WORKDIR /app
 
 # See README.md and config.default.yml for all config options
 ENV ENVIRONMENT=prod \
-    WAKAPI_DB_TYPE=sqlite3 \
-    WAKAPI_DB_USER='' \
-    WAKAPI_DB_PASSWORD='' \
-    WAKAPI_DB_HOST='' \
-    WAKAPI_DB_NAME=/data/wakapi.db \
-    WAKAPI_PASSWORD_SALT='' \
-    WAKAPI_LISTEN_IPV4='0.0.0.0' \
-    WAKAPI_INSECURE_COOKIES='true' \
-    WAKAPI_ALLOW_SIGNUP='true'
+    WAKA3X_DB_TYPE=sqlite3 \
+    WAKA3X_DB_USER='' \
+    WAKA3X_DB_PASSWORD='' \
+    WAKA3X_DB_HOST='' \
+    WAKA3X_DB_NAME=/data/waka3x.db \
+    WAKA3X_PASSWORD_SALT='' \
+    WAKA3X_LISTEN_IPV4='0.0.0.0' \
+    WAKA3X_INSECURE_COOKIES='true' \
+    WAKA3X_ALLOW_SIGNUP='true'
 
 COPY --from=build-env --chown=root:root /staging/app /app
 COPY --from=build-env --chown=nonroot:nonroot /staging/data /data
 
-LABEL org.opencontainers.image.url="https://github.com/muety/wakapi" \
-    org.opencontainers.image.documentation="https://github.com/muety/wakapi" \
-    org.opencontainers.image.source="https://github.com/muety/wakapi" \
-    org.opencontainers.image.title="Wakapi" \
+LABEL org.opencontainers.image.url="https://github.com/zetkey/waka3x" \
+    org.opencontainers.image.documentation="https://github.com/zetkey/waka3x" \
+    org.opencontainers.image.source="https://github.com/zetkey/waka3x" \
+    org.opencontainers.image.title="waka3x" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.description="A minimalist, self-hosted WakaTime-compatible backend for coding statistics"
 
@@ -60,4 +71,4 @@ EXPOSE 3000
 # For long-running migrations, you might want to override `---health-start-period` as part of `docker run` or disable healthchecks entirely with `--no-healtcheck`
 HEALTHCHECK --interval=60s --timeout=3s --start-period=120s --retries=3 CMD ["/app/healthcheck"]
 
-ENTRYPOINT ["/app/wakapi"]
+ENTRYPOINT ["/app/waka3x"]

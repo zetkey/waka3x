@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/routes"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/utils"
-	"github.com/muety/wakapi/views/mail"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/routes"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/utils"
+	"github.com/zetkey/waka3x/views/mail"
 
-	conf "github.com/muety/wakapi/config"
+	conf "github.com/zetkey/waka3x/config"
 )
 
 const (

@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -24,17 +25,21 @@ func (suite *ConfigTestSuite) SetupSuite() {}
 func (suite *ConfigTestSuite) TearDownSuite() {}
 
 func (suite *ConfigTestSuite) BeforeTest(suiteName, testName string) {
+	clearBrandEnvVars()
 	Set(Empty())
 	suite.Cfg = Get()
 	suite.Cfg.Env = "production"
 }
 
 func (suite *ConfigTestSuite) AfterTest(suiteName, testName string) {
+	clearBrandEnvVars()
+}
+
+func clearBrandEnvVars() {
 	for _, env := range os.Environ() {
-		split := strings.Split(env, "=")
-		key := split[0]
-		if strings.HasPrefix(key, "WAKAPI_") {
-			os.Setenv(strings.Split(env, "=")[0], "")
+		key, _, _ := strings.Cut(env, "=")
+		if strings.HasPrefix(key, "WAKAPI_") || strings.HasPrefix(key, "WAKA3X_") {
+			os.Unsetenv(key)
 		}
 	}
 }
@@ -79,6 +84,53 @@ func (suite *ConfigTestSuite) TestLoadOidcProviders() {
 	p2, err2 := GetOidcProvider("testprovider2")
 	suite.NoError(err2)
 	suite.Equal("Testprovider2", p2.DisplayName)
+}
+
+func (suite *ConfigTestSuite) TestLoadWaka3xEnvAliases() {
+	suite.T().Setenv("WAKA3X_PUBLIC_URL", "https://waka3x.example")
+	suite.T().Setenv("WAKA3X_DB_NAME", "waka3x_test.db")
+	suite.T().Setenv("WAKA3X_IMPORT_HOSTS_WHITELIST", "api.example.com,*.internal.test")
+
+	cfg := Load("", "")
+
+	suite.Equal("https://waka3x.example", cfg.Server.PublicUrl)
+	suite.Equal("waka3x_test.db", cfg.Db.Name)
+	suite.Equal([]string{"api.example.com", "*.internal.test"}, cfg.App.ImportHostsWhitelist)
+}
+
+func (suite *ConfigTestSuite) TestWakapiEnvTakesPrecedenceOverWaka3xAlias() {
+	suite.T().Setenv("WAKA3X_PUBLIC_URL", "https://waka3x.example")
+	suite.T().Setenv("WAKAPI_PUBLIC_URL", "https://wakapi.example")
+
+	cfg := Load("", "")
+
+	suite.Equal("https://wakapi.example", cfg.Server.PublicUrl)
+}
+
+func (suite *ConfigTestSuite) TestLoadWaka3xOidcProviderAliases() {
+	oidcMock, _ := mockoidc.Run()
+	defer oidcMock.Shutdown()
+
+	suite.T().Setenv("WAKA3X_OIDC_PROVIDERS_0_NAME", "waka3x-provider")
+	suite.T().Setenv("WAKA3X_OIDC_PROVIDERS_0_CLIENT_ID", oidcMock.ClientID)
+	suite.T().Setenv("WAKA3X_OIDC_PROVIDERS_0_CLIENT_SECRET", oidcMock.ClientSecret)
+	suite.T().Setenv("WAKA3X_OIDC_PROVIDERS_0_ENDPOINT", oidcMock.Addr()+"/oidc")
+
+	cfg := Load("", "")
+
+	suite.Len(cfg.Security.OidcProviders, 1)
+	suite.Equal("waka3x-provider", cfg.Security.OidcProviders[0].Name)
+	suite.Equal(oidcMock.ClientID, cfg.Security.OidcProviders[0].ClientID)
+}
+
+func (suite *ConfigTestSuite) TestLoadWaka3xSecretFileAlias() {
+	secretFile := filepath.Join(suite.T().TempDir(), "password_salt")
+	suite.Require().NoError(os.WriteFile(secretFile, []byte("secret-from-file\n"), 0600))
+	suite.T().Setenv("WAKA3X_PASSWORD_SALT_FILE", secretFile)
+
+	cfg := Load("", "")
+
+	suite.Equal("secret-from-file", cfg.Security.PasswordSalt)
 }
 
 func (suite *ConfigTestSuite) TestOidcProviderConfigValidate() {

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 )
 
 func SetWebAuthnSession(session *webauthn.SessionData, r *http.Request, w http.ResponseWriter) error {

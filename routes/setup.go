@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/models/view"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models/view"
+	"github.com/zetkey/waka3x/services"
 )
 
 type SetupHandler struct {

@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/duke-git/lancet/v2/condition"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 )
 
-// https://github.com/muety/wakapi/issues/882
+// https://github.com/zetkey/waka3x/issues/882
 
 func init() {
 	const name = "20260111-sqlite_real_valued_time_column_heartbeats"

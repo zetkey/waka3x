@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 )
 

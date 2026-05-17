@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 )
 
 const key = config.KeySharedData

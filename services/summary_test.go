@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/leandro-lugaresi/hub"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/mocks"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -647,7 +647,7 @@ func (suite *SummaryServiceTestSuite) TestSummaryService_Filters() {
 	}, nil).Once()
 
 	// first request: project details with filtering by project and label
-	// when requesting project details, don't ignore data from other projects even though they'd match the filter's label (see https://github.com/muety/wakapi/issues/883)
+	// when requesting project details, don't ignore data from other projects even though they'd match the filter's label (see https://github.com/zetkey/waka3x/issues/883)
 	result1, _ := sut.Aliased(from, to, suite.TestUser, sut.Summarize, filtersWithProject, nil, false)
 	effectiveFilters1 := suite.DurationService.Calls[0].Arguments[3].(*models.Filters)
 	assert.NotNil(suite.T(), result1.Branches) // project filters were applied -> include branches

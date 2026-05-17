@@ -24,7 +24,7 @@ A quick note to myself including some clarifications about time zones.
 - Loc is a parameter of the driver and used in conjunction with parseTime. It results in time.Time objects being converted to that respective zone before storage and converted back to it during retrieval
 - E.g., when inserting '2021-04-27 08:26:07 +01:00' with loc set to UTC results in the actual database column to show '2021-04-27 07:26:07'
 - A loc value of "Local" is effective the same as setting loc to the value of the TZ environment variable (or system default otherwise)
-- Note that if loc is different from "Local", when using models.CustomTime, values are first received in loc zone and then converted to whatever Wakapi's current zone is (e.g. specified through TZ env.), see https://github.com/muety/wakapi/blob/bc2096f4117275d110a84f5b367aa8fdb4bd87ba/models/shared.go#L95.
+- Note that if loc is different from "Local", when using models.CustomTime, values are first received in loc zone and then converted to whatever Wakapi's current zone is (e.g. specified through TZ env.), see https://github.com/zetkey/waka3x/blob/bc2096f4117275d110a84f5b367aa8fdb4bd87ba/models/shared.go#L95.
 - Currently, we don't set a session tz (only loc), so the database server will assume it receives dates in its system time. However, as no tz is set when retrieving the values either, they are also going to be returned just as is and as long as `loc=Local` is set properly, they are parsed in Go code with the correct time zone
 - In other words, using loc causes the Go driver to take care of zones, while using a session timezone causes MySQL to take care of zones (?)
 - As long as the Wakapi server always runs in the same time zone, it will always parse these dates the same way (i.e. as time.Local, Europe/Berlin in case of Wakapi.dev)
@@ -44,7 +44,7 @@ A quick note to myself including some clarifications about time zones.
 For Postgres, the story is even a different one.
 - There are `timestamp` and `timestamptz` columns, whereby the former seems to behave very strangely.
 - Apparently, when storing dates, they'll just chop off zone information entirely, while for retrieval, all dates are interpreted as UTC
-- If Wakapi runs in CEST, '2025-03-25T14:00:00 +02:00' will end up as '2025-03-25T14:00:00' in the database and become '2025-03-25T16:00:00 +02:00' when retrieved back (at least in case of our annoying models.CustomTime, because of https://github.com/muety/wakapi/blob/bc2096f4117275d110a84f5b367aa8fdb4bd87ba/models/shared.go#L95)
+- If Wakapi runs in CEST, '2025-03-25T14:00:00 +02:00' will end up as '2025-03-25T14:00:00' in the database and become '2025-03-25T16:00:00 +02:00' when retrieved back (at least in case of our annoying models.CustomTime, because of https://github.com/zetkey/waka3x/blob/bc2096f4117275d110a84f5b367aa8fdb4bd87ba/models/shared.go#L95)
 - For `timestamptz`, columns don't actually store tz information either (https://github.com/jackc/pgx/issues/520#issuecomment-479692198), but at least allow for correct retrieval. The driver will return dates already in the application's TZ
 - Here (https://github.com/go-gorm/gorm/issues/4834) is an interesting discussion on the issue
 - According to https://www.cybertec-postgresql.com/en/time-zone-management-in-postgresql/, good practice is to always use timestamptz, leaving conversions to the database itself

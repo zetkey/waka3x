@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/muety/wakapi/mocks"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"

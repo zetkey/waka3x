@@ -2,14 +2,14 @@ package v1
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/helpers"
+	"github.com/zetkey/waka3x/helpers"
 	"net/http"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	v1 "github.com/muety/wakapi/models/compat/wakatime/v1"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	v1 "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
 )
 
 type UsersHandler struct {

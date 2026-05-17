@@ -4,9 +4,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 )
 
 // https://wakatime.com/api/v1/users/current/stats/last_7_days

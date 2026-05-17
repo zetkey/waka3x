@@ -11,8 +11,8 @@ import (
 	"github.com/duke-git/lancet/v2/random"
 	"github.com/duke-git/lancet/v2/slice"
 	"github.com/go-webauthn/webauthn/webauthn"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/utils"
 )
 
 const (
@@ -56,7 +56,7 @@ type User struct {
 	StripeCustomerId       string                `json:"-"`
 	InvitedBy              string                `json:"-"`
 	ExcludeUnknownProjects bool                  `json:"-"`
-	HeartbeatsTimeoutSec   int                   `json:"-" gorm:"default:600"` // https://github.com/muety/wakapi/issues/156
+	HeartbeatsTimeoutSec   int                   `json:"-" gorm:"default:600"` // https://github.com/zetkey/waka3x/issues/156
 	ReadmeStatsBaseUrl     string                `json:"-" gorm:"default:''"`
 	AuthType               string                `json:"auth_type" gorm:"default:local;uniqueIndex:idx_oidc;size:255"`
 	Sub                    string                `json:"sub" gorm:"uniqueIndex:idx_oidc;size:255;default:null"` // openid connect subject

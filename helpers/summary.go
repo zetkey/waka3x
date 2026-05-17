@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 )
 
 func ParseSummaryParams(r *http.Request) (*models.SummaryParams, error) {
@@ -69,7 +69,7 @@ func ParseSummaryFilters(r *http.Request) *models.Filters {
 		filters.With(models.SummaryBranch, q)
 	}
 	if q := r.URL.Query().Get("entity"); q != "" {
-		filters.With(models.SummaryBranch, q)
+		filters.With(models.SummaryEntity, q)
 	}
 	if q := r.URL.Query().Get("category"); q != "" {
 		filters.With(models.SummaryCategory, q)

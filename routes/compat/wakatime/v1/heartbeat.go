@@ -3,15 +3,15 @@ package v1
 import (
 	"github.com/duke-git/lancet/v2/datetime"
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/helpers"
+	"github.com/zetkey/waka3x/helpers"
 	"net/http"
 	"time"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	wakatime "github.com/muety/wakapi/models/compat/wakatime/v1"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	wakatime "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
 )
 
 type HeartbeatsResult struct {

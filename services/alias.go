@@ -7,9 +7,9 @@ import (
 
 	"github.com/becheran/wildmatch-go"
 	datastructure "github.com/duke-git/lancet/v2/datastructure/set"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/repositories"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/repositories"
 )
 
 type AliasService struct {

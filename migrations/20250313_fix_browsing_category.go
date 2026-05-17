@@ -1,8 +1,8 @@
 package migrations
 
 import (
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 )
 

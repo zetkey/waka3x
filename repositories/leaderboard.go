@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/duke-git/lancet/v2/strutil"
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 	"regexp"
 	"strings"
 )

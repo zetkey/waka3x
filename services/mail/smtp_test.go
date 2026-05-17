@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"log/slog"

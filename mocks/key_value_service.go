@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )

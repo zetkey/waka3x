@@ -8,15 +8,15 @@ import (
 
 	"github.com/duke-git/lancet/v2/datetime"
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/helpers"
+	"github.com/zetkey/waka3x/helpers"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/models"
-	v1 "github.com/muety/wakapi/models/compat/wakatime/v1"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models"
+	v1 "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/utils"
 )
 
 type SummariesHandler struct {
@@ -43,7 +43,7 @@ func (h *SummariesHandler) RegisterRoutes(router chi.Router) {
 // TODO: Support parameters: project, branches, timeout, writes_only
 // See https://wakatime.com/developers#summaries.
 // Timezone can be specified via an offset suffix (e.g. +02:00) in date strings.
-// Requires https://github.com/muety/wakapi/issues/108.
+// Requires https://github.com/zetkey/waka3x/issues/108.
 
 // @Summary Retrieve WakaTime-compatible summaries
 // @Description Mimics https://wakatime.com/developers#summaries.
@@ -121,7 +121,7 @@ func (h *SummariesHandler) loadUserSummaries(r *http.Request, user *models.User)
 	// wakatime interprets end date as "inclusive", wakapi usually as "exclusive"
 	// i.e. for wakatime, an interval 2021-04-29 - 2021-04-29 is actually 2021-04-29 - 2021-04-30,
 	// while for wakapi it would be empty
-	// see https://github.com/muety/wakapi/issues/192
+	// see https://github.com/zetkey/waka3x/issues/192
 	end = datetime.EndOfDay(end)
 
 	if !end.After(start) {

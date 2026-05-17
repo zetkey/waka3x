@@ -26,7 +26,7 @@ app:
   data_cleanup_time: '0 0 6 * * 0'                          # time at which to run old data cleanup (if enabled through data_retention_months)
   optimize_database_time: '0 0 8 1 * *'                     # time at which to run database vacuuming (sqlite, postgres) or table optimization (mysql)
   inactive_days: 7                                          # time of previous days within a user must have logged in to be considered active
-  import_enabled: true                                      # whether data import from wakatime or other wakapi instances is allowed
+  import_enabled: true                                      # whether data import from wakatime or other waka3x instances is allowed
   import_backoff_min: 5                                     # time (in minutes) for "cooldown" before allowing another data import attempt by a user
   import_max_rate: 24                                       # minimum hours to pass after a successful data import by a user before attempting a new one
   import_batch_size: 50                                     # maximum number of heartbeats to insert into the database within one transaction
@@ -61,7 +61,7 @@ app:
 
   # url template for user avatar images (to be used with services like gravatar or dicebear)
   # available variable placeholders are: username, username_hash, email, email_hash
-  # defaults to wakapi's internal avatar rendering powered by https://codeberg.org/Codeberg/avatars
+  # defaults to waka3x's internal avatar rendering powered by https://codeberg.org/Codeberg/avatars
   avatar_url_template: api/avatar/{username_hash}.svg
 
   # go time format strings to format human-readable dates
@@ -75,7 +75,7 @@ db:
   socket:                             # alternative to db.host (leave blank when using sqlite3)
   user:                               # leave blank when using sqlite3
   password:                           # leave blank when using sqlite3
-  name: wakapi_db.db                  # database name for mysql / postgres or file path for sqlite (e.g. /tmp/wakapi.db)
+  name: waka3x.db                     # database name for mysql / postgres or file path for sqlite (e.g. /tmp/waka3x.db)
   dialect: sqlite3                    # mysql, postgres, sqlite3
   charset: utf8mb4                    # only used for mysql connections
   max_conn: 10                        # maximum number of concurrent connections to maintain
@@ -91,20 +91,20 @@ security:
   oidc_allow_signup: true               # allow registration of new users from oidc
   oidc_insecure: false                   # skip tls certificate validation for oidc provider
   disable_local_auth: false             # disable login via local credentials (username and password) to enforce OIDC provider login
-  disable_webauthn: true                # disable login via webauthn (security keys, biometrics, etc.)
+  disable_webauthn: false                # disable login via webauthn (security keys, biometrics, etc.)
   signup_captcha: false
   invite_codes: true                    # whether to enable invite codes for overriding disabled signups
   disable_frontpage: false
   expose_metrics: false
-  enable_proxy: false                       # only intended for production instance at wakapi.dev
-  trusted_header_auth: false                # whether to enable trusted header auth for reverse proxies, use with caution!! (https://github.com/muety/wakapi/issues/534)
+  enable_proxy: false                       # only intended for production instance at waka3x.dev
+  trusted_header_auth: false                # whether to enable trusted header auth for reverse proxies, use with caution!! (https://github.com/zetkey/waka3x/issues/534)
   trusted_header_auth_key: Remote-User      # header field for trusted header auth (warning: your proxy must correctly strip this header from client requests!!)
-  trusted_header_auth_allow_signup: false   # whether to allow creation of new users based on upstream trusted header authentication (https://github.com/muety/wakapi/issues/808)
+  trusted_header_auth_allow_signup: false   # whether to allow creation of new users based on upstream trusted header authentication (https://github.com/zetkey/waka3x/issues/808)
   trust_reverse_proxy_ips:                  # single ip address of the reverse proxy which you trust to pass headers for authentication
   signup_max_rate: 5/1h                     # signup endpoint rate limit pattern
   login_max_rate: 10/1m                     # login endpoint rate limit pattern
   password_reset_max_rate: 5/1h             # password reset endpoint rate limit pattern
-  oidc:                                     # list of openid connect providers available for user signup and login, see https://github.com/muety/wakapi/wiki/OpenID-Connect-login-(SSO)
+  oidc:                                     # list of openid connect providers available for user signup and login, see https://github.com/zetkey/waka3x/wiki/OpenID-Connect-login-(SSO)
 
 sentry:
   dsn:                                # leave blank to disable sentry integration
@@ -112,7 +112,7 @@ sentry:
   sample_rate: 0.75                   # probability of tracing a request
   sample_rate_heartbeats: 0.1         # probability of tracing a heartbeat request
 
-# only relevant for running wakapi as a hosted service with paid subscriptions and stripe payments
+# only relevant for running waka3x as a hosted service with paid subscriptions and stripe payments
 subscriptions:
   enabled: false
   expiry_notifications: true
@@ -124,7 +124,7 @@ subscriptions:
 mail:
   enabled: false                         # whether to enable mails (used for password resets, reports, etc.)
   provider: smtp                        # method for sending mails, currently one of ['smtp']
-  sender: Wakapi <wakapi@example.org>   # email sender -> replace with valid email address!
+  sender: Waka3x <waka3x@example.org>   # email sender -> replace with valid email address!
   skip_verify_mx_record: false          # whether to skip validating mx dns record for user email addresses
 
   # smtp settings when sending mails via smtp

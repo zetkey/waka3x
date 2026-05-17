@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

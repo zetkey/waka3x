@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 	"github.com/stretchr/testify/assert"
 )
 

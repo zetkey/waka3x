@@ -3,7 +3,7 @@ package view
 import (
 	"time"
 
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 )
 
 type SettingsViewModel struct {

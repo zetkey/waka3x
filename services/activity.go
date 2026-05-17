@@ -13,10 +13,10 @@ import (
 	"github.com/alitto/pond/v2"
 	"github.com/duke-git/lancet/v2/condition"
 	"github.com/duke-git/lancet/v2/datetime"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -47,7 +47,7 @@ func NewActivityService(summaryService ISummaryService) *ActivityService {
 	}
 }
 
-// GetChart generates an activity chart for a given user and the given time interval, similar to GitHub's contribution timeline. See https://github.com/muety/wakapi/issues/12.
+// GetChart generates an activity chart for a given user and the given time interval, similar to GitHub's contribution timeline. See https://github.com/zetkey/waka3x/issues/12.
 // Please note: currently, only yearly charts ("last_12_months") are supported. However, we could fairly easily restructure this to support dynamic intervals.
 func (s *ActivityService) GetChart(user *models.User, interval *models.IntervalKey, darkTheme, hideAttribution, skipCache bool) (string, error) {
 	cacheKey := fmt.Sprintf("chart_%s_%s_%v_%v", user.ID, (*interval)[0], darkTheme, hideAttribution)

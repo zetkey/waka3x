@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/models"
-	v1 "github.com/muety/wakapi/models/compat/wakatime/v1"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models"
+	v1 "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
 )
 
 type UserAgentsHandler struct {

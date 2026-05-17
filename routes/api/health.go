@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	"github.com/muety/wakapi/helpers"
+	"github.com/zetkey/waka3x/helpers"
 	"net/http"
 	"strings"
 

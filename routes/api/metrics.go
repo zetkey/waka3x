@@ -11,15 +11,15 @@ import (
 
 	"github.com/alitto/pond/v2"
 	"github.com/go-chi/chi/v5"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/models"
-	v1 "github.com/muety/wakapi/models/compat/wakatime/v1"
-	mm "github.com/muety/wakapi/models/metrics"
-	"github.com/muety/wakapi/repositories"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models"
+	v1 "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	mm "github.com/zetkey/waka3x/models/metrics"
+	"github.com/zetkey/waka3x/repositories"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/utils"
 )
 
 const (

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/models"
 )
 
 const (

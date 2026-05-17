@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/duke-git/lancet/v2/slice"
-	conf "github.com/muety/wakapi/config"
+	conf "github.com/zetkey/waka3x/config"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -57,7 +57,7 @@ func (r *BaseRepository) VacuumOrOptimize() {
 	// see https://www.postgresql.org/docs/current/sql-vacuum.html and https://www.sqlite.org/lang_vacuum.html
 	// mysql (with innodb storage engine) runs a vacuuming-like operation automatically in the background (https://mariadb.com/docs/server/server-usage/storage-engines/innodb/innodb-purge)
 	// instead, mysql optionally provides table optimization, that is, a sort of "defragmentation" (https://dev.mysql.com/doc/refman/8.4/en/optimize-table.html)
-	// also see https://github.com/muety/wakapi/issues/785
+	// also see https://github.com/zetkey/waka3x/issues/785
 	t0 := time.Now()
 
 	if strings.HasPrefix(r.db.Dialector.Name(), "sqlite") || r.db.Dialector.Name() == "postgres" {
@@ -92,7 +92,7 @@ func (r *BaseRepository) VacuumOrOptimize() {
 }
 
 func InsertBatchChunked[T any](data []T, model T, db *gorm.DB) error {
-	// insert in chunks, because otherwise sqlite (later also mysql) will complain about too many placeholders in prepared query, see https://github.com/muety/wakapi/issues/840
+	// insert in chunks, because otherwise sqlite (later also mysql) will complain about too many placeholders in prepared query, see https://github.com/zetkey/waka3x/issues/840
 	return db.Transaction(func(tx *gorm.DB) error {
 		chunks := slice.Chunk[T](data, chunkSize)
 		for _, chunk := range chunks {

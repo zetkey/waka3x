@@ -5,8 +5,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	lru "github.com/hashicorp/golang-lru"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/utils"
 	"net/http"
 	"time"
 )

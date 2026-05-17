@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 )
 
 const DefaultWakaUserDisplayName = "Anonymous User"

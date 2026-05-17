@@ -7,15 +7,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/cors"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/middlewares"
-	customMiddleware "github.com/muety/wakapi/middlewares/custom"
-	"github.com/muety/wakapi/models"
-	v1 "github.com/muety/wakapi/models/compat/wakatime/v1"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/middlewares"
+	customMiddleware "github.com/zetkey/waka3x/middlewares/custom"
+	"github.com/zetkey/waka3x/models"
+	v1 "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/utils"
 )
 
 type HeartbeatApiHandler struct {
@@ -40,7 +40,7 @@ func (h *HeartbeatApiHandler) RegisterRoutes(router chi.Router) {
 			middlewares.NewAuthenticateMiddleware(h.userSrvc).WithOptionalForMethods(http.MethodOptions).WithFullAccessOnly(true).Handler,
 			customMiddleware.NewWakatimeRelayMiddleware().Handler,
 		)
-		// see https://github.com/muety/wakapi/issues/203
+		// see https://github.com/zetkey/waka3x/issues/203
 		r.Post("/heartbeat", h.Post)
 		r.Post("/heartbeats", h.Post)
 		r.Post("/users/{user}/heartbeats", h.Post)
@@ -50,7 +50,7 @@ func (h *HeartbeatApiHandler) RegisterRoutes(router chi.Router) {
 		r.Post("/compat/wakatime/v1/users/{user}/heartbeats", h.Post)
 		r.Post("/compat/wakatime/v1/users/{user}/heartbeats.bulk", h.Post)
 
-		// https://github.com/muety/wakapi/issues/690
+		// https://github.com/zetkey/waka3x/issues/690
 		for _, route := range r.Routes() {
 			r.Options(route.Pattern, cors.AllowAll().HandlerFunc)
 		}

@@ -7,9 +7,9 @@ import (
 	"github.com/go-webauthn/webauthn/webauthn"
 	"gorm.io/gorm"
 
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/models/types"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/models/types"
+	"github.com/zetkey/waka3x/utils"
 )
 
 type IAggregationService interface {

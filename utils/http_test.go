@@ -104,27 +104,27 @@ var userAgents = []struct {
 		nil,
 	},
 	{
-		"wakatime/v1.105.0 (linux-6.11.8-zen1-2-zen-unknown) go1.23.3 cursor/1.93.1 vscode-wakatime/24.8.0", // https://github.com/muety/wakapi/issues/712
+		"wakatime/v1.105.0 (linux-6.11.8-zen1-2-zen-unknown) go1.23.3 cursor/1.93.1 vscode-wakatime/24.8.0", // https://github.com/zetkey/waka3x/issues/712
 		"Linux",
 		"cursor",
 		nil,
 	},
 	{
-		// https://github.com/muety/wakapi/issues/817
-		// https://github.com/muety/wakapi/issues/718 (previously)
+		// https://github.com/zetkey/waka3x/issues/817
+		// https://github.com/zetkey/waka3x/issues/718 (previously)
 		"wakatime/v1.106.1 (linux-5.15.167.4-microsoft-standard-WSL2-unknown) go1.23.3 cursor/1.93.1 vscode-wakatime/24.9.2",
 		"WSL",
 		"cursor",
 		nil,
 	},
 	{
-		"HBuilder X/4.56 (Windows_NT 10.0.26100)", // https://github.com/muety/wakapi/issues/765
+		"HBuilder X/4.56 (Windows_NT 10.0.26100)", // https://github.com/zetkey/waka3x/issues/765
 		"Windows",
 		"HBuilder X",
 		nil,
 	},
 	{
-		"wakatime/1.139.1 (linux-6.18.8-unknown) go1.25.5 helix/25.07.1 (74075bb5) wakatime-ls/0.2.2 helix-wakatime/0.2.2", // https://github.com/muety/wakapi/issues/914
+		"wakatime/1.139.1 (linux-6.18.8-unknown) go1.25.5 helix/25.07.1 (74075bb5) wakatime-ls/0.2.2 helix-wakatime/0.2.2", // https://github.com/zetkey/waka3x/issues/914
 		"Linux",
 		"helix",
 		nil,

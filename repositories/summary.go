@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/duke-git/lancet/v2/slice"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -39,7 +39,7 @@ func (r *SummaryRepository) GetAll() ([]*models.Summary, error) {
 
 func (r *SummaryRepository) InsertWithRetry(summary *models.Summary) (err error) {
 	// in case of duplicate key error, retry inserting up to three times
-	// https://github.com/muety/wakapi/issues/877
+	// https://github.com/zetkey/waka3x/issues/877
 	for i := 0; i < 3; i++ {
 		err = r.Insert(summary)
 		if err == nil || !errors.Is(err, gorm.ErrDuplicatedKey) {
@@ -60,8 +60,8 @@ func (r *SummaryRepository) Insert(summary *models.Summary) error {
 		itemsToCreate := []*models.SummaryItem{}
 
 		// required due to setting gorm:"-" in the model definition
-		// see https://github.com/muety/wakapi/issues/600#issuecomment-1921723789
-		// see https://github.com/muety/wakapi/pull/592#discussion_r1450478355
+		// see https://github.com/zetkey/waka3x/issues/600#issuecomment-1921723789
+		// see https://github.com/zetkey/waka3x/pull/592#discussion_r1450478355
 		for _, item := range summary.Machines {
 			item.SummaryID = summary.ID
 			itemsToCreate = append(itemsToCreate, item)

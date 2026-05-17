@@ -4,6 +4,7 @@ config*.yml
 *.db
 *.exe
 wakapi
+waka3x
 Dockerfile
 compose.yml
 .dockerignore

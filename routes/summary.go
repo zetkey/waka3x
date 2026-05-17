@@ -7,14 +7,14 @@ import (
 
 	"github.com/duke-git/lancet/v2/slice"
 	"github.com/go-chi/chi/v5"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/models/view"
-	su "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/models/view"
+	su "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/utils"
 )
 
 const (
@@ -127,7 +127,7 @@ func (h *SummaryHandler) GetIndex(w http.ResponseWriter, r *http.Request) {
 		hourlyBreakdownFrom = summaryParams.To.Add(-24 * time.Hour)
 	}
 	if durations, err := h.durationSrvc.Get(hourlyBreakdownFrom, summaryParams.To, summaryParams.User, summaryParams.Filters, nil, false); err == nil {
-		// for excessively many small segments, plotting is too performance-heavy and will freeze the browser (see https://github.com/muety/wakapi/issues/871)
+		// for excessively many small segments, plotting is too performance-heavy and will freeze the browser (see https://github.com/zetkey/waka3x/issues/871)
 		// and the chart would be unreadable anyway, so we simply disable it
 		if len(durations) <= 200 {
 			hourlyBreakdown = view.NewHourlyBreakdownViewModel(view.NewHourlyBreakdownItems(durations, func(t uint8, k string) string {

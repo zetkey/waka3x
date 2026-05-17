@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/duke-git/lancet/v2/condition"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"gorm.io/gorm"
 )
 

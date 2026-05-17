@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/models"
 )
 
 // https://shields.io/endpoint

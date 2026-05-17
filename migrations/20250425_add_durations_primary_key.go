@@ -1,12 +1,12 @@
 package migrations
 
 import (
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 )
 
-// In the context if https://github.com/muety/wakapi/issues/777, we retroactively added a primary key column to the durations table.
+// In the context if https://github.com/zetkey/waka3x/issues/777, we retroactively added a primary key column to the durations table.
 // However, SQLite doesn't allow to alter an existing table that way. Workaround is to create a new one and copy its contents.
 
 func init() {

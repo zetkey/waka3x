@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/muety/artifex/v2"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/utils"
 	"log/slog"
 )
 

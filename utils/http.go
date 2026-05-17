@@ -24,7 +24,7 @@ const (
 
 var cacheMaxAgeRe *regexp.Regexp
 
-// https://github.com/muety/wakapi/issues/914
+// https://github.com/zetkey/waka3x/issues/914
 var editorMiddlewares = set.New[string]("wakatime-ls", "wakatime-cli")
 
 // https://github.com/wakatime/wakatime-cli/blob/2d84fc82f57b9a8bc113edbd24f6b41762b96816/pkg/ai/ai.go#L45
@@ -125,7 +125,7 @@ func ParseUserAgent(ua string) (string, string, error) { // os, editor, err
 			} else if os == "darwin" {
 				os = "macos"
 			}
-			// special treatment for wsl (see https://github.com/muety/wakapi/issues/817)
+			// special treatment for wsl (see https://github.com/zetkey/waka3x/issues/817)
 			osAllCaps := false
 			if strings.Contains(ua, "-WSL2-") {
 				os = "wsl"
@@ -142,7 +142,7 @@ func ParseUserAgent(ua string) (string, string, error) { // os, editor, err
 		if len(parsedUa.OS) > 0 {
 			return strutil.Capitalize(parsedUa.OS), parsedUa.Name, nil
 		} else if strings.Contains(strings.ToLower(ua), "windows") {
-			return "Windows", parsedUa.Name, nil // special treatment for https://github.com/muety/wakapi/issues/765
+			return "Windows", parsedUa.Name, nil // special treatment for https://github.com/zetkey/waka3x/issues/765
 		}
 	}
 	return "", "", errors.New("failed to parse user agent string")

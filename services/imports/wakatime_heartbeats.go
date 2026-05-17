@@ -8,14 +8,14 @@ import (
 	"github.com/alitto/pond/v2"
 	"github.com/duke-git/lancet/v2/datetime"
 	"github.com/muety/artifex/v2"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/utils"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	wakatime "github.com/muety/wakapi/models/compat/wakatime/v1"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	wakatime "github.com/zetkey/waka3x/models/compat/wakatime/v1"
 	"go.uber.org/atomic"
 	"log/slog"
 )
@@ -181,7 +181,7 @@ func (w *WakatimeHeartbeatsImporter) fetchRange(baseUrl string) (time.Time, time
 		return notime, notime, err
 	}
 
-	// see https://github.com/muety/wakapi/issues/370
+	// see https://github.com/zetkey/waka3x/issues/370
 	allTimeData, err := utils.ParseJsonDropKeys[wakatime.AllTimeViewModel](res.Body, "text")
 	if err != nil {
 		return notime, notime, err

@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/duke-git/lancet/v2/condition"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"gorm.io/gorm"
 )
 
@@ -258,7 +258,7 @@ func (r *HeartbeatRepository) GetUserProjectStats(user *models.User, from, to ti
 	// note: limit / offset doesn't really improve query performance
 	// query takes quite long, depending on the number of heartbeats (~ 7 seconds for ~ 500k heartbeats)
 	// TODO: refactor this to use summaries once we implemented persisting filtered, multi-interval summaries
-	// see https://github.com/muety/wakapi/issues/524#issuecomment-1731668391
+	// see https://github.com/zetkey/waka3x/issues/524#issuecomment-1731668391
 
 	// multi-line string with backticks yields an error with the github.com/glebarez/sqlite driver
 
@@ -356,7 +356,7 @@ func (r *HeartbeatRepository) GetUserAgentsByUser(user *models.User) ([]*models.
 }
 
 // since sqlite doesn't datetime column type, naive string comparison / sorting won't properly respect timezones
-// this is problematic in case of heartbeats in mixed zones, see https://github.com/muety/wakapi/issues/882
+// this is problematic in case of heartbeats in mixed zones, see https://github.com/zetkey/waka3x/issues/882
 
 func (r *HeartbeatRepository) buildTimeFilteredQuery(userId string, from, to time.Time) *gorm.DB {
 	query := r.db.Model(&models.Heartbeat{}).Where(&models.Heartbeat{UserID: userId})

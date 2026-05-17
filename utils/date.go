@@ -48,7 +48,7 @@ func SplitRangeByDays(from time.Time, to time.Time) [][]time.Time {
 
 	for t1 := from; t1.Before(to); {
 		t2 := datetime.BeginOfDay(t1).AddDate(0, 0, 1)
-		// https://github.com/muety/wakapi/issues/779
+		// https://github.com/zetkey/waka3x/issues/779
 		if t2 == t1 {
 			t1 = datetime.BeginOfDay(t1).Add(24 * time.Hour)
 			continue

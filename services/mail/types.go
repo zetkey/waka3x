@@ -1,6 +1,6 @@
 package mail
 
-import "github.com/muety/wakapi/models"
+import "github.com/zetkey/waka3x/models"
 
 type PasswordResetTplData struct {
 	ResetLink string

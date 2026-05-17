@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/glebarez/sqlite"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/utils"
 	"gorm.io/driver/postgres"
 
 	"gorm.io/gorm"
@@ -52,7 +52,7 @@ func (j CustomTime) GormDBDataType(db *gorm.DB, field *schema.Field) string {
 	t := "timestamp"
 
 	if db.Config.Dialector.Name() == (postgres.Dialector{}).Name() {
-		// TODO: migrate to timestamptz, see https://github.com/muety/wakapi/issues/771
+		// TODO: migrate to timestamptz, see https://github.com/zetkey/waka3x/issues/771
 	}
 
 	if db.Dialector.Name() != (sqlite.Dialector{}).Name() { // https://github.com/glebarez/go-sqlite/issues/186
@@ -103,7 +103,7 @@ func (j *CustomTime) Scan(value interface{}) error {
 		return errors.New(fmt.Sprintf("unsupported type: %T", value))
 	}
 
-	// see https://github.com/muety/wakapi/issues/771
+	// see https://github.com/zetkey/waka3x/issues/771
 	// -> "reinterpret" postgres dates (received as UTC) in local zone, assuming they had also originally been inserted as such
 	if !hacksInitialized {
 		postgresTimezoneHack = config.Get().Db.IsPostgres()

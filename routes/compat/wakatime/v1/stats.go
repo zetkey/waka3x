@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/helpers"
+	"github.com/zetkey/waka3x/helpers"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/models"
-	v1 "github.com/muety/wakapi/models/compat/wakatime/v1"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models"
+	v1 "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	"github.com/zetkey/waka3x/services"
 )
 
 type StatsHandler struct {
@@ -42,7 +42,7 @@ func (h *StatsHandler) RegisterRoutes(router chi.Router) {
 	})
 }
 
-// TODO: support filtering (requires https://github.com/muety/wakapi/issues/108)
+// TODO: support filtering (requires https://github.com/zetkey/waka3x/issues/108)
 
 // @Summary Retrieve statistics for a given user
 // @Description Mimics https://wakatime.com/developers#stats

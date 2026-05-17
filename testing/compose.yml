@@ -2,9 +2,9 @@ services:
   postgres:
     image: postgres:17
     environment:
-      POSTGRES_USER: "wakapi"
-      POSTGRES_PASSWORD: "wakapi"
-      POSTGRES_DB: "wakapi"
+      POSTGRES_USER: "waka3x"
+      POSTGRES_PASSWORD: "waka3x"
+      POSTGRES_DB: "waka3x"
       PGPORT: 55432
     network_mode: host
 
@@ -12,9 +12,9 @@ services:
     image: mysql:8
     environment:
       MYSQL_TCP_PORT: 53306
-      MYSQL_USER: "wakapi"
-      MYSQL_PASSWORD: "wakapi"
-      MYSQL_DATABASE: "wakapi"
+      MYSQL_USER: "waka3x"
+      MYSQL_PASSWORD: "waka3x"
+      MYSQL_DATABASE: "waka3x"
       MYSQL_ROOT_PASSWORD: example
     network_mode: host
 
@@ -22,8 +22,8 @@ services:
     image: mariadb:11
     environment:
       MYSQL_TCP_PORT: 53306
-      MARIADB_USER: "wakapi"
-      MARIADB_PASSWORD: "wakapi"
-      MARIADB_DATABASE: "wakapi"
+      MARIADB_USER: "waka3x"
+      MARIADB_PASSWORD: "waka3x"
+      MARIADB_DATABASE: "waka3x"
       MARIADB_ROOT_PASSWORD: example
     network_mode: host

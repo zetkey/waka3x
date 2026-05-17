@@ -14,10 +14,10 @@ import (
 	"github.com/duke-git/lancet/v2/datetime"
 	"github.com/duke-git/lancet/v2/slice"
 	"github.com/leandro-lugaresi/hub"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/models/types"
-	"github.com/muety/wakapi/repositories"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/models/types"
+	"github.com/zetkey/waka3x/repositories"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -173,7 +173,7 @@ func (srv *SummaryService) Retrieve(from, to time.Time, user *models.User, filte
 		return nil, err
 	}
 
-	// prevent 0001-01-01T00:00:00 caused by empty "pre" missing interval, see https://github.com/muety/wakapi/issues/843
+	// prevent 0001-01-01T00:00:00 caused by empty "pre" missing interval, see https://github.com/zetkey/waka3x/issues/843
 	summary.FromTime = models.CustomTime(condition.Ternary(summary.FromTime.T().Before(from), from, summary.FromTime.T()))
 
 	if summary.TotalTime() == 0 {

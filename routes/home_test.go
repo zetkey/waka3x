@@ -2,10 +2,10 @@ package routes
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/mocks"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"

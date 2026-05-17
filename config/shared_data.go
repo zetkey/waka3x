@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/muety/wakapi/lib"
+	"github.com/zetkey/waka3x/lib"
 )
 
 type SharedDataKey string

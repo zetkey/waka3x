@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/services"
 )
 
 // CheckEffectiveUser extracts the requested user from a URL (like '/users/{user}'), compares it with the currently authorized user and writes an HTTP error if they differ.

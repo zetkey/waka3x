@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/muety/wakapi/mocks"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/suite"
 )

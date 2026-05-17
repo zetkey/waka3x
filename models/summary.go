@@ -417,7 +417,7 @@ func (s *Summary) WithResolvedAliases(resolve AliasResolver) *Summary {
 
 // inplace!
 func (s *Summary) InTZ(tz *time.Location) *Summary {
-	// time zone madness, see https://github.com/muety/wakapi/issues/719#issuecomment-2599365514
+	// time zone madness, see https://github.com/zetkey/waka3x/issues/719#issuecomment-2599365514
 	s.FromTime = CustomTime(s.FromTime.T().In(tz))
 	s.ToTime = CustomTime(s.ToTime.T().In(tz))
 	return s

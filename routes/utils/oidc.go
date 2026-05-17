@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/duke-git/lancet/v2/random"
-	conf "github.com/muety/wakapi/config"
+	conf "github.com/zetkey/waka3x/config"
 )
 
 func SetOidcState(state string, r *http.Request, w http.ResponseWriter) {

@@ -2,8 +2,8 @@ package migrations
 
 import (
 	"github.com/gofrs/uuid/v5"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 )
 

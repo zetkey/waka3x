@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/muety/wakapi/models"
-	routeutils "github.com/muety/wakapi/routes/utils"
+	"github.com/zetkey/waka3x/models"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
 )
 
 func SetPrincipal(r *http.Request, user *models.User) {

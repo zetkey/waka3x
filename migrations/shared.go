@@ -3,8 +3,8 @@ package migrations
 import (
 	"log/slog"
 
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"gorm.io/gorm"
 )
 

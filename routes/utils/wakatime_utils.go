@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/url"
 
-	conf "github.com/muety/wakapi/config"
+	conf "github.com/zetkey/waka3x/config"
 )
 
 func ValidateWakatimeUrl(baseUrl string) error {

@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"errors"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 )
 

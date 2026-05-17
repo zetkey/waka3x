@@ -10,12 +10,12 @@ import (
 	datastructure "github.com/duke-git/lancet/v2/datastructure/set"
 	"github.com/duke-git/lancet/v2/maputil"
 	"github.com/leandro-lugaresi/hub"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/repositories"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/repositories"
+	"github.com/zetkey/waka3x/utils"
 	"github.com/patrickmn/go-cache"
 
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 )
 
 type HeartbeatService struct {
@@ -66,7 +66,7 @@ func (srv *HeartbeatService) InsertBatch(heartbeats []*models.Heartbeat) error {
 
 	hashes := datastructure.New[string]()
 
-	// https://github.com/muety/wakapi/issues/139
+	// https://github.com/zetkey/waka3x/issues/139
 	filteredHeartbeats := make([]*models.Heartbeat, 0, len(heartbeats))
 	for _, hb := range heartbeats {
 		if !hashes.Contain(hb.Hash) {

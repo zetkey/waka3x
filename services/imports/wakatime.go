@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	routeutils "github.com/muety/wakapi/routes/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
 )
 
 type WakatimeImporter struct {

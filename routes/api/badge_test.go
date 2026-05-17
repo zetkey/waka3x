@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/mocks"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/routes"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/routes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

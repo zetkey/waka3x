@@ -16,10 +16,10 @@ import (
 	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/repositories"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/repositories"
+	"github.com/zetkey/waka3x/utils"
 )
 
 type UserService struct {
@@ -281,7 +281,7 @@ func (srv *UserService) ChangeUserId(user *models.User, newUserId string) (*mode
 		return nil, errors.New("sqlite database too old to perform user id change consistently")
 	}
 
-	// https://github.com/muety/wakapi/issues/739
+	// https://github.com/zetkey/waka3x/issues/739
 	oldUserId := user.ID
 	defer srv.FlushUserCache(oldUserId)
 

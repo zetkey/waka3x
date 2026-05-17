@@ -2,8 +2,8 @@ package utils
 
 import (
 	datastructure "github.com/duke-git/lancet/v2/datastructure/set"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/services"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/services"
 	"sort"
 )
 
@@ -11,7 +11,7 @@ import (
 // Example: "A" mapped to "AB" using an alias
 // -> "A" itself should not appear as a project anymore
 // -> Instead, the "virtual" project "AB" shall appear
-// See https://github.com/muety/wakapi/issues/231
+// See https://github.com/zetkey/waka3x/issues/231
 func GetEffectiveProjectsList(user *models.User, heartbeatSrvc services.IHeartbeatService, aliasSrvc services.IAliasService) ([]string, error) {
 	// extract actual projects from heartbeats
 	realProjects, err := heartbeatSrvc.GetEntitySetByUser(models.SummaryProject, user.ID)

@@ -83,7 +83,7 @@ func CompareArgon2Id(hashed, plain, pepper string) bool {
 func HashArgon2Id(plain, pepper string) (string, error) {
 	plainPepperedPassword := strings.TrimSpace(plain) + pepper
 	params := *argon2id.DefaultParams
-	if params.Parallelism == 0 { // https://github.com/muety/wakapi/issues/866
+	if params.Parallelism == 0 { // https://github.com/zetkey/waka3x/issues/866
 		params.Parallelism = uint8(mathutil.Min[int](runtime.NumCPU(), 255))
 	}
 	hash, err := argon2id.CreateHash(plainPepperedPassword, &params)

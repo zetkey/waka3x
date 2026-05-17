@@ -1,15 +1,15 @@
 package migrations
 
 import (
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 	"log/slog"
 )
 
-// migration to fix https://github.com/muety/wakapi/issues/346
-// caused by https://github.com/muety/wakapi/blob/2.3.2/migrations/20220319_add_user_project_idx.go in combination with
-// the wrongly defined index at https://github.com/muety/wakapi/blob/5aae18e2415d9e620f383f98cd8cbdf39cd99f27/models/heartbeat.go#L18
+// migration to fix https://github.com/zetkey/waka3x/issues/346
+// caused by https://github.com/zetkey/waka3x/blob/2.3.2/migrations/20220319_add_user_project_idx.go in combination with
+// the wrongly defined index at https://github.com/zetkey/waka3x/blob/5aae18e2415d9e620f383f98cd8cbdf39cd99f27/models/heartbeat.go#L18
 // and https://github.com/go-gorm/sqlite/issues/87
 // -> drop index and let it be auto-created again with properly formatted ddl
 

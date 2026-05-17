@@ -11,32 +11,33 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/duke-git/lancet/v2/condition"
+	// "github.com/duke-git/lancet/v2/condition"
 	_ "github.com/glebarez/sqlite"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/lpar/gzipped/v2"
-	"github.com/muety/wakapi/utils"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/zetkey/waka3x/utils"
 	_ "gorm.io/driver/mysql"
 	_ "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/middlewares"
-	"github.com/muety/wakapi/migrations"
-	"github.com/muety/wakapi/repositories"
-	"github.com/muety/wakapi/routes"
-	"github.com/muety/wakapi/routes/api"
-	shieldsV1Routes "github.com/muety/wakapi/routes/compat/shields/v1"
-	wtV1Routes "github.com/muety/wakapi/routes/compat/wakatime/v1"
-	"github.com/muety/wakapi/services"
-	"github.com/muety/wakapi/services/mail"
-	"github.com/muety/wakapi/static/docs"
-	fsutils "github.com/muety/wakapi/utils/fs"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/migrations"
+	"github.com/zetkey/waka3x/repositories"
+	"github.com/zetkey/waka3x/routes"
+	"github.com/zetkey/waka3x/routes/api"
+	shieldsV1Routes "github.com/zetkey/waka3x/routes/compat/shields/v1"
+	wtV1Routes "github.com/zetkey/waka3x/routes/compat/wakatime/v1"
+	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/services/mail"
+	"github.com/zetkey/waka3x/static/docs"
+	fsutils "github.com/zetkey/waka3x/utils/fs"
 )
 
 // Embed version.txt
@@ -48,6 +49,9 @@ var version string
 //
 //go:embed static
 var staticFiles embed.FS
+
+//go:embed frontend/dist
+var frontendFiles embed.FS
 
 var (
 	db     *gorm.DB
@@ -93,9 +97,9 @@ var (
 
 // TODO: Refactor entire project to be structured after business domains
 
-// @title Wakapi API
+// @title Waka3x API
 // @version 1.0
-// @description REST API to interact with [Wakapi](https://wakapi.dev)
+// @description REST API to interact with Waka3x.
 // @description
 // @description ## Authentication
 // @description Set header `Authorization` to your API Key encoded as Base64 and prefixed with `Basic`
@@ -106,7 +110,7 @@ var (
 // @contact.email ferdinand@muetsch.io
 
 // @license.name GPL-3.0
-// @license.url https://github.com/muety/wakapi/blob/master/LICENSE
+// @license.url https://github.com/zetkey/waka3x/blob/master/LICENSE
 
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
@@ -126,7 +130,7 @@ func main() {
 	// Configure Swagger docs
 	docs.SwaggerInfo.BasePath = config.Server.BasePath + "/api"
 
-	slog.Info("Wakapi", "version", config.Version)
+	slog.Info("Waka3x", "version", config.Version)
 
 	// Set up GORM
 	gormLogger := logger.New(
@@ -221,13 +225,31 @@ func main() {
 	rootApiHandler := api.NewApiRootHandler()
 	healthApiHandler := api.NewHealthApiHandler(db)
 	heartbeatApiHandler := api.NewHeartbeatApiHandler(userService, heartbeatService, languageMappingService)
-	summaryApiHandler := api.NewSummaryApiHandler(userService, summaryService)
+	summaryApiHandler := api.NewSummaryApiHandler(userService, summaryService, heartbeatService, durationService, aliasService)
 	metricsHandler := api.NewMetricsHandler(userService, summaryService, heartbeatService, leaderboardService, keyValueService, metricsRepository)
 	diagnosticsHandler := api.NewDiagnosticsApiHandler(userService, diagnosticsService)
 	avatarHandler := api.NewAvatarHandler()
 	activityHandler := api.NewActivityApiHandler(userService, activityService)
 	badgeHandler := api.NewBadgeHandler(userService, summaryService)
 	captchaHandler := api.NewCaptchaHandler()
+	authApiHandler := api.NewAuthApiHandler(userService, mailService, keyValueService, webAuthnService)
+	projectsApiHandler := api.NewProjectsApiHandler(userService, heartbeatService)
+	leaderboardApiHandler := api.NewLeaderboardApiHandler(userService, leaderboardService)
+	metaApiHandler := api.NewMetaApiHandler(userService, keyValueService)
+	settingsApiHandler := api.NewSettingsApiHandler(
+		userService,
+		heartbeatService,
+		durationService,
+		summaryService,
+		aliasService,
+		aggregationService,
+		languageMappingService,
+		projectLabelService,
+		keyValueService,
+		mailService,
+		apiKeyService,
+		webAuthnService,
+	)
 
 	// Compat Handlers
 	wakatimeV1StatusBarHandler := wtV1Routes.NewStatusBarHandler(userService, summaryService)
@@ -242,16 +264,16 @@ func main() {
 	shieldV1BadgeHandler := shieldsV1Routes.NewBadgeHandler(summaryService, userService)
 
 	// MVC Handlers
-	summaryHandler := routes.NewSummaryHandler(summaryService, userService, heartbeatService, durationService, aliasService)
-	settingsHandler := routes.NewSettingsHandler(userService, heartbeatService, durationService, summaryService, aliasService, aggregationService, languageMappingService, projectLabelService, keyValueService, mailService, apiKeyService, webAuthnService)
+	// summaryHandler := routes.NewSummaryHandler(summaryService, userService, heartbeatService, durationService, aliasService)
+	// settingsHandler := routes.NewSettingsHandler(userService, heartbeatService, durationService, summaryService, aliasService, aggregationService, languageMappingService, projectLabelService, keyValueService, mailService, apiKeyService, webAuthnService)
 	subscriptionHandler := routes.NewSubscriptionHandler(userService, mailService, keyValueService)
-	projectsHandler := routes.NewProjectsHandler(userService, heartbeatService)
-	homeHandler := routes.NewHomeHandler(userService, keyValueService)
-	loginHandler := routes.NewLoginHandler(userService, mailService, keyValueService, webAuthnService)
-	imprintHandler := routes.NewImprintHandler(keyValueService)
-	setupHandler := routes.NewSetupHandler(userService)
-	leaderboardHandler := condition.Ternary[bool, routes.Handler](config.App.LeaderboardEnabled, routes.NewLeaderboardHandler(userService, leaderboardService), routes.NewNoopHandler())
-	miscHandler := routes.NewMiscHandler(userService)
+	// projectsHandler := routes.NewProjectsHandler(userService, heartbeatService)
+	// homeHandler := routes.NewHomeHandler(userService, keyValueService)
+	// loginHandler := routes.NewLoginHandler(userService, mailService, keyValueService, webAuthnService)
+	// imprintHandler := routes.NewImprintHandler(keyValueService)
+	// setupHandler := routes.NewSetupHandler(userService)
+	// leaderboardHandler := condition.Ternary[bool, routes.Handler](config.App.LeaderboardEnabled, routes.NewLeaderboardHandler(userService, leaderboardService), routes.NewNoopHandler())
+	// miscHandler := routes.NewMiscHandler(userService)
 
 	// Setup Routing
 	router := chi.NewRouter()
@@ -283,19 +305,25 @@ func main() {
 	router.Mount("/", rootRouter)
 	router.Mount("/api", apiRouter)
 
-	// Route registrations
-	homeHandler.RegisterRoutes(rootRouter)
-	loginHandler.RegisterRoutes(rootRouter)
-	imprintHandler.RegisterRoutes(rootRouter)
-	setupHandler.RegisterRoutes(rootRouter)
-	summaryHandler.RegisterRoutes(rootRouter)
-	leaderboardHandler.RegisterRoutes(rootRouter)
-	projectsHandler.RegisterRoutes(rootRouter)
-	settingsHandler.RegisterRoutes(rootRouter)
-	subscriptionHandler.RegisterRoutes(rootRouter)
-	miscHandler.RegisterRoutes(rootRouter)
+	// Route registrations (Disabled SSR in favor of SPA)
+	/*
+		homeHandler.RegisterRoutes(rootRouter)
+		loginHandler.RegisterRoutes(rootRouter)
+		imprintHandler.RegisterRoutes(rootRouter)
+		setupHandler.RegisterRoutes(rootRouter)
+		summaryHandler.RegisterRoutes(rootRouter)
+		leaderboardHandler.RegisterRoutes(rootRouter)
+		projectsHandler.RegisterRoutes(rootRouter)
+		settingsHandler.RegisterRoutes(rootRouter)
+		subscriptionHandler.RegisterRoutes(rootRouter)
+		miscHandler.RegisterRoutes(rootRouter)
+	*/
 
 	// API route registrations
+	rootRouter.Get("/oidc/{provider}/login", authApiHandler.GetOidcLogin)
+	rootRouter.Get("/oidc/{provider}/callback", authApiHandler.GetOidcCallback)
+	subscriptionHandler.RegisterRoutes(rootRouter)
+
 	rootApiHandler.RegisterRoutes(apiRouter)
 	summaryApiHandler.RegisterRoutes(apiRouter)
 	healthApiHandler.RegisterRoutes(apiRouter)
@@ -316,6 +344,11 @@ func main() {
 	wakatimeV1UserAgentsHandler.RegisterRoutes(apiRouter)
 	shieldV1BadgeHandler.RegisterRoutes(apiRouter)
 	captchaHandler.RegisterRoutes(apiRouter)
+	authApiHandler.RegisterRoutes(apiRouter)
+	projectsApiHandler.RegisterRoutes(apiRouter)
+	leaderboardApiHandler.RegisterRoutes(apiRouter)
+	metaApiHandler.RegisterRoutes(apiRouter)
+	settingsApiHandler.RegisterRoutes(apiRouter)
 
 	// Static Routes
 	// https://github.com/golang/go/issues/43431
@@ -333,6 +366,28 @@ func main() {
 	router.Get("/assets/*", assetsFileServer.ServeHTTP)
 	router.Get("/swagger-ui", http.RedirectHandler("swagger-ui/", http.StatusMovedPermanently).ServeHTTP) // https://github.com/swaggo/http-swagger/issues/44
 	router.Get("/swagger-ui/*", httpSwagger.WrapHandler)
+
+	// SPA Static
+	embeddedFrontend, _ := fs.Sub(frontendFiles, "frontend/dist")
+	frontendFs := http.FS(embeddedFrontend)
+	frontendFileServer := http.FileServer(frontendFs)
+
+	// Catch-all for SPA
+	router.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+		// If requesting a file that exists in frontend/dist, serve it
+		if f, err := frontendFs.Open(strings.TrimPrefix(r.URL.Path, "/")); err == nil {
+			f.Close()
+			frontendFileServer.ServeHTTP(w, r)
+			return
+		}
+		// Otherwise serve index.html (SPA fallback)
+		if f, err := frontendFs.Open("index.html"); err == nil {
+			defer f.Close()
+			http.ServeContent(w, r, "index.html", time.Now(), f)
+			return
+		}
+		http.NotFound(w, r)
+	})
 
 	if config.EnablePprof {
 		slog.Info("profiling enabled, exposing pprof data", "url", "http://127.0.0.1:6060/debug/pprof")
@@ -387,13 +442,13 @@ func listen(handler http.Handler) {
 	}
 
 	if config.UseTLS() {
-		if s4 != nil && !utils.IPv4HandledByDualStackHttp(s4, s6) { // https://github.com/muety/wakapi/issues/860
+		if s4 != nil && !utils.IPv4HandledByDualStackHttp(s4, s6) { // https://github.com/zetkey/waka3x/issues/860
 			slog.Info("👉 Listening for HTTPS... ✅", "address", s4.Addr)
 			go func() {
 				if err := s4.ListenAndServeTLS(config.Server.TlsCertPath, config.Server.TlsKeyPath); err != nil {
 					err := err.Error()
 					if s6 != nil {
-						err += " - possibly a dual-stack problem (https://github.com/muety/wakapi/issues/860)?"
+						err += " - possibly a dual-stack problem (https://github.com/zetkey/waka3x/issues/860)?"
 					}
 					conf.Log().Fatal(err)
 				}
@@ -423,13 +478,13 @@ func listen(handler http.Handler) {
 			}()
 		}
 	} else {
-		if s4 != nil && !utils.IPv4HandledByDualStackHttp(s4, s6) { // https://github.com/muety/wakapi/issues/860
+		if s4 != nil && !utils.IPv4HandledByDualStackHttp(s4, s6) { // https://github.com/zetkey/waka3x/issues/860
 			slog.Info("👉 Listening for HTTP... ✅", "address", s4.Addr)
 			go func() {
 				if err := s4.ListenAndServe(); err != nil {
 					err := err.Error()
 					if s6 != nil {
-						err += " - possibly a dual-stack problem (https://github.com/muety/wakapi/issues/860)?"
+						err += " - possibly a dual-stack problem (https://github.com/zetkey/waka3x/issues/860)?"
 					}
 					conf.Log().Fatal(err)
 				}

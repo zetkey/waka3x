@@ -7,18 +7,18 @@ import (
 	"errors"
 	"fmt"
 	"github.com/duke-git/lancet/v2/slice"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/utils"
 	"net/http"
 	"time"
 
 	"github.com/muety/artifex/v2"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	wakatime "github.com/muety/wakapi/models/compat/wakatime/v1"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	wakatime "github.com/zetkey/waka3x/models/compat/wakatime/v1"
 	"log/slog"
 )
 
-// data example: https://github.com/muety/wakapi/issues/323#issuecomment-1627467052
+// data example: https://github.com/zetkey/waka3x/issues/323#issuecomment-1627467052
 
 type WakatimeDumpImporter struct {
 	apiKey     string
@@ -159,7 +159,7 @@ func (w *WakatimeDumpImporter) withHeaders(req *http.Request) *http.Request {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
-	// workaround for https://github.com/muety/wakapi/issues/602
+	// workaround for https://github.com/zetkey/waka3x/issues/602
 	// super weird behavior:
 	// when keeping req.Close set to false (keep connection alive), we'll get an "unexpected EOF" error inside checkDumpAvailable(),
 	// even though i can neither reproduce this error with curl, nor in a minimal, stand-alone go example (https://go.dev/play/p/HY_RLtTWnkk works totally fine)

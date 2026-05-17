@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/duke-git/lancet/v2/condition"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 )
 

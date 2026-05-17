@@ -3,12 +3,12 @@ package api
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"github.com/muety/wakapi/helpers"
+	"github.com/zetkey/waka3x/helpers"
 	"net/http"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/services"
 )
 
 type DiagnosticsApiHandler struct {

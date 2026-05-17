@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/muety/wakapi/helpers"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/models/types"
-	"github.com/muety/wakapi/services"
+	"github.com/zetkey/waka3x/helpers"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/models/types"
+	"github.com/zetkey/waka3x/services"
 )
 
 func LoadUserSummary(ss services.ISummaryService, r *http.Request) (*models.Summary, error, int) {

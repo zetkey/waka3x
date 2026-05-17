@@ -3,8 +3,8 @@ package services
 import (
 	"github.com/go-webauthn/webauthn/webauthn"
 
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/repositories"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/repositories"
 )
 
 type WebAuthnService struct {

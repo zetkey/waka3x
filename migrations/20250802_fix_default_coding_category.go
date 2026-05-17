@@ -1,11 +1,11 @@
 package migrations
 
 import (
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 	"gorm.io/gorm"
 )
 
-// see https://github.com/muety/wakapi/issues/817#issuecomment-3146365708
+// see https://github.com/zetkey/waka3x/issues/817#issuecomment-3146365708
 
 func init() {
 	const name = "20250802_fix_default_coding_category"

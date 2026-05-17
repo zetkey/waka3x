@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muety/wakapi/mocks"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -225,7 +225,7 @@ func (suite *DurationServiceTestSuite) TestDurationService_Get_Filtered() {
 }
 
 func (suite *DurationServiceTestSuite) TestDurationService_Get_ProjectDetails() {
-	// https:// github.com/muety/wakapi/issues/876
+	// https:// github.com/zetkey/waka3x/issues/876
 	sut := NewDurationService(suite.DurationRepository, suite.HeartbeatService, suite.UserService, suite.LanguageMappingService)
 
 	var (
@@ -395,7 +395,7 @@ func (suite *DurationServiceTestSuite) TestDurationService_Get_WithLanguageMappi
 }
 
 func (suite *DurationServiceTestSuite) TestDurationService_Get_WithLanguageMappingsForExistingLanguages() {
-	// https:// github.com/muety/wakapi/issues/928
+	// https:// github.com/zetkey/waka3x/issues/928
 	sut := NewDurationService(suite.DurationRepository, suite.HeartbeatService, suite.UserService, suite.LanguageMappingService)
 
 	// Setup heartbeats

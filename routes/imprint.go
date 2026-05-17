@@ -2,10 +2,10 @@ package routes
 
 import (
 	"github.com/go-chi/chi/v5"
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/models/view"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/models/view"
+	"github.com/zetkey/waka3x/services"
 	"net/http"
 )
 

@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/utils"
 )
 
 type UserAgent struct {

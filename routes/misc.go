@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	conf "github.com/muety/wakapi/config"
-	routeutils "github.com/muety/wakapi/routes/utils"
-	"github.com/muety/wakapi/services"
+	conf "github.com/zetkey/waka3x/config"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
 )
 
 // TODO(oidc): tests (not only for oidc, but login in general)

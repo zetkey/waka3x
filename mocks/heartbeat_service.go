@@ -3,8 +3,8 @@ package mocks
 import (
 	"time"
 
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
 	"github.com/stretchr/testify/mock"
 )
 

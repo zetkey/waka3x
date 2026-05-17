@@ -3,7 +3,7 @@ package routes
 import (
 	"testing"
 
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 	"github.com/stretchr/testify/suite"
 )
 

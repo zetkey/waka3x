@@ -3,8 +3,8 @@ package utils
 import (
 	"net/http"
 
-	conf "github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models/view"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models/view"
 )
 
 func SetError(r *http.Request, w http.ResponseWriter, message string) {

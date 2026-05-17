@@ -1,13 +1,13 @@
 package migrations
 
 import (
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
 	"gorm.io/gorm"
 	"strings"
 )
 
-// fix for https://github.com/muety/wakapi/issues/416
+// fix for https://github.com/zetkey/waka3x/issues/416
 
 func init() {
 	const name = "20221002-fix_summary_id_types"
@@ -60,7 +60,7 @@ func init() {
 						return err
 					}
 				}
-				// https://github.com/muety/wakapi/issues/416#issuecomment-1271674792
+				// https://github.com/zetkey/waka3x/issues/416#issuecomment-1271674792
 				if db.Migrator().HasConstraint(&models.SummaryItem{}, "fk_summary_items_summary") {
 					if err := db.Migrator().DropConstraint(&models.SummaryItem{}, "fk_summary_items_summary"); err != nil {
 						return err

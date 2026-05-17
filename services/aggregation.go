@@ -8,9 +8,9 @@ import (
 
 	datastructure "github.com/duke-git/lancet/v2/datastructure/set"
 	"github.com/muety/artifex/v2"
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 )
 
 const (

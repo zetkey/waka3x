@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	wakatime "github.com/muety/wakapi/models/compat/wakatime/v1"
-	"github.com/muety/wakapi/utils"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	wakatime "github.com/zetkey/waka3x/models/compat/wakatime/v1"
+	"github.com/zetkey/waka3x/utils"
 )
 
 // https://wakatime.com/api/v1/users/current/machine_names

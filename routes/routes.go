@@ -5,13 +5,13 @@ import (
 	"strings"
 
 	"github.com/duke-git/lancet/v2/strutil"
-	"github.com/muety/wakapi/helpers"
+	"github.com/zetkey/waka3x/helpers"
 
 	"github.com/duke-git/lancet/v2/datetime"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/utils"
-	"github.com/muety/wakapi/views"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/utils"
+	"github.com/zetkey/waka3x/views"
 )
 
 var templates map[string]*template.Template

@@ -3,7 +3,7 @@ package utils
 import (
 	"net/http"
 
-	"github.com/muety/wakapi/config"
+	"github.com/zetkey/waka3x/config"
 )
 
 func ClearSession(r *http.Request, w http.ResponseWriter) {

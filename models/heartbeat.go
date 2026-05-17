@@ -28,7 +28,7 @@ type Heartbeat struct {
 	Machine         string `json:"machine" gorm:"index:idx_machine" hash:"ignore"`                   // ignored because wakatime api doesn't return machines currently
 	UserAgent       string `json:"user_agent" hash:"ignore" gorm:"type:varchar(255)"`
 	// note: on sqlite, table will have an additional column `time_real`, introduced "manually" by migration 20260111
-	// see https://github.com/muety/wakapi/issues/882 for details
+	// see https://github.com/zetkey/waka3x/issues/882 for details
 	Time             CustomTime `json:"time" gorm:"timeScale:3; index:idx_time; index:idx_time_user; not null" swaggertype:"primitive,number"`
 	Hash             string     `json:"-" hash:"ignore" gorm:"type:varchar(17); uniqueIndex"`
 	Origin           string     `json:"-" hash:"ignore" gorm:"type:varchar(255)"`
@@ -65,7 +65,7 @@ func (h *Heartbeat) Sanitize() *Heartbeat {
 		if h.Type == "domain" || h.Type == "url" {
 			h.Category = "browsing"
 		} else if h.Type == "file" && h.Language != "" {
-			h.Category = "coding" // assuming coding as default, see https://github.com/muety/wakapi/issues/817#issuecomment-3146365708
+			h.Category = "coding" // assuming coding as default, see https://github.com/zetkey/waka3x/issues/817#issuecomment-3146365708
 		}
 	}
 

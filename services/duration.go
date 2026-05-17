@@ -13,9 +13,9 @@ import (
 	"github.com/duke-git/lancet/v2/tuple"
 	"github.com/leandro-lugaresi/hub"
 	"github.com/muety/artifex/v2"
-	"github.com/muety/wakapi/config"
-	"github.com/muety/wakapi/models"
-	"github.com/muety/wakapi/repositories"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/models"
+	"github.com/zetkey/waka3x/repositories"
 )
 
 const heartbeatPadding = 0 * time.Second
@@ -70,7 +70,7 @@ func (srv *DurationService) Get(from, to time.Time, user *models.User, filters *
 	// while durations themselves store the interval (aka. heartbeats timeout) they were computed for, we currently don't support actually storing durations at different intervals
 	// if an interval different from the user's preference is requested, recompute durations live from heartbeats and skip cache
 	effectiveTimeout := getEffectiveTimeout(user, customTimeout)
-	skipCache = skipCache || effectiveTimeout != user.HeartbeatsTimeout() || filters.IsProjectDetails() // related: https://github.com/muety/wakapi/issues/876
+	skipCache = skipCache || effectiveTimeout != user.HeartbeatsTimeout() || filters.IsProjectDetails() // related: https://github.com/zetkey/waka3x/issues/876
 
 	// recompute live
 	if skipCache {
@@ -210,7 +210,7 @@ func (srv *DurationService) getLive(from, to time.Time, user *models.User, inter
 		}
 
 		d1 := models.NewDurationFromHeartbeat(h).WithTimeout(interval)
-		if !includeEntities { // related to https://github.com/muety/wakapi/issues/876
+		if !includeEntities { // related to https://github.com/zetkey/waka3x/issues/876
 			d1 = d1.WithEntityIgnored()
 		}
 		d1 = d1.Hashed()
@@ -273,7 +273,7 @@ func (srv *DurationService) filter(durations []*models.Duration, user *models.Us
 		// Even when filters are applied, we'll still have to compute the whole summary first and then filter out non-matching durations.
 		// If we fetched only matching heartbeats in the first place, there will be false positive gaps (see heartbeatsTimeout)
 		// in case the user worked on different projects in parallel.
-		// See https://github.com/muety/wakapi/issues/535, https://github.com/muety/wakapi/issues/716
+		// See https://github.com/zetkey/waka3x/issues/535, https://github.com/zetkey/waka3x/issues/716
 		if filters != nil && !filters.MatchDuration(d) {
 			continue
 		}

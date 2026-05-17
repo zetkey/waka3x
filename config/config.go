@@ -21,9 +21,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/configor"
-	"github.com/muety/wakapi/data"
-	"github.com/muety/wakapi/utils"
 	"github.com/robfig/cron/v3"
+	"github.com/zetkey/waka3x/data"
+	"github.com/zetkey/waka3x/utils"
 
 	"github.com/becheran/wildmatch-go"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -107,7 +107,7 @@ type appConfig struct {
 	ImportBackoffMin          int                          `yaml:"import_backoff_min" default:"5" env:"WAKAPI_IMPORT_BACKOFF_MIN"`
 	ImportMaxRate             int                          `yaml:"import_max_rate" default:"24" env:"WAKAPI_IMPORT_MAX_RATE"` // at max one successful import every x hours
 	ImportBatchSize           int                          `yaml:"import_batch_size" default:"50" env:"WAKAPI_IMPORT_BATCH_SIZE"`
-	ImportHostsWhitelist      []string                     `yaml:"import_hosts_whitelist"` // or WAKAPI_IMPORT_HOSTS_WHITELIST (read manually during load)
+	ImportHostsWhitelist      []string                     `yaml:"import_hosts_whitelist"` // or WAKA3X_IMPORT_HOSTS_WHITELIST / WAKAPI_IMPORT_HOSTS_WHITELIST (read manually during load)
 	InactiveDays              int                          `yaml:"inactive_days" default:"7" env:"WAKAPI_INACTIVE_DAYS"`
 	HeartbeatMaxAge           string                       `yaml:"heartbeat_max_age" default:"168h" env:"WAKAPI_HEARTBEAT_MAX_AGE"`
 	CountCacheTTLMin          int                          `yaml:"count_cache_ttl_min" default:"30" env:"WAKAPI_COUNT_CACHE_TTL_MIN"`
@@ -116,7 +116,7 @@ type appConfig struct {
 	MaxInactiveMonths         int                          `yaml:"max_inactive_months" default:"-1" env:"WAKAPI_MAX_INACTIVE_MONTHS"`
 	WarmCaches                bool                         `yaml:"warm_caches" default:"true" env:"WAKAPI_WARM_CACHES"`
 	AvatarURLTemplate         string                       `yaml:"avatar_url_template" default:"api/avatar/{username_hash}.svg" env:"WAKAPI_AVATAR_URL_TEMPLATE"`
-	SupportContact            string                       `yaml:"support_contact" default:"hostmaster@wakapi.dev" env:"WAKAPI_SUPPORT_CONTACT"`
+	SupportContact            string                       `yaml:"support_contact" default:"hostmaster@waka3x.dev" env:"WAKAPI_SUPPORT_CONTACT"`
 	DateFormat                string                       `yaml:"date_format" default:"Mon, 02 Jan 2006" env:"WAKAPI_DATE_FORMAT"`
 	DateTimeFormat            string                       `yaml:"datetime_format" default:"Mon, 02 Jan 2006 15:04" env:"WAKAPI_DATETIME_FORMAT"`
 	CustomLanguages           map[string]string            `yaml:"custom_languages"`
@@ -158,7 +158,7 @@ type dbConfig struct {
 	Port                    uint   `env:"WAKAPI_DB_PORT"`
 	User                    string `env:"WAKAPI_DB_USER"`
 	Password                string `env:"WAKAPI_DB_PASSWORD"`
-	Name                    string `default:"wakapi_db.db" env:"WAKAPI_DB_NAME"`
+	Name                    string `default:"waka3x.db" env:"WAKAPI_DB_NAME"`
 	Dialect                 string `yaml:"-"`
 	Charset                 string `default:"utf8mb4" env:"WAKAPI_DB_CHARSET"`
 	Type                    string `yaml:"dialect" default:"sqlite3" env:"WAKAPI_DB_TYPE"`
@@ -584,6 +584,7 @@ func Get() *Config {
 }
 
 func Load(configFlag string, version string) *Config {
+	aliasBrandEnvVars()
 	loadSecretFiles()
 	renameEnvVars()
 
@@ -776,7 +777,7 @@ func InitWebAuthn(config *Config) {
 	}
 
 	webauthnConfig := &webauthn.Config{
-		RPDisplayName: "Wakapi",
+		RPDisplayName: "Waka3x",
 		RPID:          parsedURL.Hostname(),              // without "https://"
 		RPOrigins:     []string{config.Server.PublicUrl}, // with "https://"
 	}
@@ -796,11 +797,14 @@ func renameEnvVars() {
 	// Since configor cannot parse slices with custom keys (see https://github.com/jinzhu/configor/issues/93)
 	// and neither allows to specify prefixes via tags (only the entire variable name as "env:"), we simply rename variables from the "Wakapi-style" format to what configor expects.
 	// In the long run, we might want to migrate to a different config parser (e.g. https://github.com/knadh/koanf), since configor seems to be dead.
-	// Also see https://github.com/muety/wakapi/issues/856.
+	// Also see https://github.com/zetkey/waka3x/issues/856.
 	var envOidcPrefix = regexp.MustCompile("WAKAPI_OIDC_PROVIDERS_(\\d+)_([A-Z_]+)")
 
 	for _, e := range os.Environ() {
-		parts := strings.Split(e, "=")
+		parts := strings.SplitN(e, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
 		k, v := parts[0], parts[1]
 
 		// oidc providers config
@@ -817,11 +821,35 @@ func renameEnvVars() {
 	}
 }
 
-// Support for reading Docker secrets from mounted files, whose filenames are provided as environment variables like WAKAPI_PASSWORD_SALT_FILE
-// https://github.com/muety/wakapi?tab=readme-ov-file#docker-compose
+func aliasBrandEnvVars() {
+	for _, e := range os.Environ() {
+		parts := strings.SplitN(e, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		k, v := parts[0], parts[1]
+		if !strings.HasPrefix(k, "WAKA3X_") {
+			continue
+		}
+
+		alias := "WAKAPI_" + strings.TrimPrefix(k, "WAKA3X_")
+		if _, exists := os.LookupEnv(alias); exists {
+			continue
+		}
+
+		if err := os.Setenv(alias, v); err != nil {
+			slog.Error("failed to alias env. variable", "key", k, "alias", alias, "error", err)
+			os.Exit(1)
+		}
+	}
+}
+
+// Support for reading Docker secrets from mounted files, whose filenames are provided as environment variables like WAKA3X_PASSWORD_SALT_FILE
+// https://github.com/zetkey/waka3x?tab=readme-ov-file#docker-compose
 // https://hub.docker.com/_/mysql#docker-secrets
-// https://github.com/muety/wakapi/pull/679/changes
-// We used to source those variables using bash (see https://github.com/muety/wakapi/blob/7fa0a6f78ce56957f4f5a5c5abd68fc08cde12de/entrypoint.sh#L7),
+// https://github.com/zetkey/waka3x/pull/679/changes
+// We used to source those variables using bash (see https://github.com/zetkey/waka3x/blob/7fa0a6f78ce56957f4f5a5c5abd68fc08cde12de/entrypoint.sh#L7),
 // but then switched to do this programmatically from within Wakapi itself so we don't need bash (or any other shell) and thus are free to use distroless Docker images.
 func loadSecretFiles() {
 	for _, e := range os.Environ() {

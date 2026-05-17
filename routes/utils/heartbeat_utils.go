@@ -3,7 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/muety/wakapi/models"
+	"github.com/zetkey/waka3x/models"
 	"io"
 	"net/http"
 )
