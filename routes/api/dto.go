@@ -233,6 +233,7 @@ type SummaryDetailsResponse struct {
 	EditorColors        map[string]string                `json:"editor_colors"`
 	LanguageColors      map[string]string                `json:"language_colors"`
 	OSColors            map[string]string                `json:"os_colors"`
+	AICodingRatio       float64                          `json:"ai_coding_ratio"`
 	Timeline            []TimelineResponse               `json:"timeline"`
 	HourlyBreakdown     []HourlyBreakdownProjectResponse `json:"hourly_breakdown"`
 	HourlyBreakdownFrom time.Time                        `json:"hourly_breakdown_from"`

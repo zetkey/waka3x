@@ -7,11 +7,11 @@ import {
   ChevronDown,
   Clock,
   Code,
+  Bot,
   Download,
   Filter,
   Folder,
   Loader2,
-  Monitor,
 } from "lucide-vue-next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,6 +77,31 @@ const totalSeconds = computed(
   () => summary.value?.projects.reduce((acc, p) => acc + p.total, 0) || 0,
 );
 
+function categoryTotal(key: string) {
+  return (
+    summary.value?.categories.find(
+      (category) => category.key.toLowerCase() === key,
+    )?.total || 0
+  );
+}
+
+const aiCodingRatio = computed(() => {
+  if (typeof details.value?.ai_coding_ratio === "number") {
+    return details.value.ai_coding_ratio;
+  }
+
+  const aiCoding = categoryTotal("ai coding");
+  const coding = categoryTotal("coding");
+  const total = aiCoding + coding;
+  if (!total) return 0;
+
+  return Math.round((aiCoding / total) * 100) / 100;
+});
+
+const aiCodingPercentage = computed(
+  () => `${Math.round(aiCodingRatio.value * 100)} %`,
+);
+
 const kpis = computed(() => {
   const s = summary.value;
   if (!s) return [];
@@ -94,12 +119,8 @@ const kpis = computed(() => {
     },
     { label: "Top Project", value: s.projects[0]?.key || "-", icon: Folder },
     { label: "Top Language", value: s.languages[0]?.key || "-", icon: Code },
-    {
-      label: "Top OS",
-      value: s.operating_systems[0]?.key || "-",
-      icon: Monitor,
-    },
     { label: "Top Editor", value: s.editors[0]?.key || "-", icon: AppWindow },
+    { label: "AI coding ratio", value: aiCodingPercentage.value, icon: Bot },
   ];
 });
 

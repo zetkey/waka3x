@@ -129,6 +129,7 @@ func (h *SummaryApiHandler) GetDetails(w http.ResponseWriter, r *http.Request) {
 		EditorColors:        routeutils.FilterColors(h.config.App.GetEditorColors(), summary.Editors),
 		LanguageColors:      routeutils.FilterColors(h.config.App.GetLanguageColors(), summary.Languages),
 		OSColors:            routeutils.FilterColors(h.config.App.GetOSColors(), summary.OperatingSystems),
+		AICodingRatio:       summary.CategoryRatio("ai coding", "ai coding", "coding"),
 		Timeline:            newTimelineResponse(timeline),
 		HourlyBreakdown:     newHourlyBreakdownResponse(hourlyBreakdown),
 		HourlyBreakdownFrom: hourlyBreakdownFrom,

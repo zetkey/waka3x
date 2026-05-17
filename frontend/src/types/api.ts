@@ -249,6 +249,7 @@ export interface SummaryDetails {
   editor_colors: Record<string, string>;
   language_colors: Record<string, string>;
   os_colors: Record<string, string>;
+  ai_coding_ratio: number;
   timeline: TimelineDay[] | null;
   hourly_breakdown: HourlyBreakdownProject[];
   hourly_breakdown_from: ISODateTime;
