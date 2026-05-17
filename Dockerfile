@@ -1,6 +1,8 @@
 FROM --platform=$BUILDPLATFORM oven/bun:alpine AS frontend-build
 WORKDIR /frontend
 
+RUN apk add --no-cache nodejs
+
 COPY ./frontend/package.json ./frontend/bun.lock ./
 RUN bun install --frozen-lockfile
 

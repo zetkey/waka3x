@@ -69,15 +69,18 @@ $ docker run -d \
 
 Alternatively, you can use Docker Compose for an even more straightforward deployment. See [compose.yml](https://github.com/zetkey/waka3x/blob/main/compose.yml) for configuration details.
 
-Waka3x supports [Docker Secrets](https://docs.docker.com/compose/how-tos/use-secrets/) for the following variables: `WAKA3X_PASSWORD_SALT`, `WAKA3X_DB_PASSWORD`, `WAKA3X_MAIL_SMTP_PASS`. You can set these either by having them mounted as a secret file, or directly pass them as environment variables.
+Waka3x uses [Docker Secrets](https://docs.docker.com/compose/how-tos/use-secrets/) for sensitive variables: `WAKA3X_PASSWORD_SALT`, `WAKA3X_DB_PASSWORD`, `WAKA3X_MAIL_SMTP_PASS`. These are sourced from environment variables defined in a `.env` file.
 
-##### Example
+##### Setup
 
 ```bash
-export WAKA3X_PASSWORD_SALT=changeme
-export WAKA3X_DB_PASSWORD=changeme
-export WAKA3X_MAIL_SMTP_PASS=changeme
+# Copy the sample environment file
+cp .env.sample .env
 
+# Edit .env and set your secure values
+vi .env
+
+# Start the services
 docker compose up -d
 ```
 

@@ -46,8 +46,9 @@ services:
     secrets:
       - db_password
 
-# secrets can be defined either from a local file or from an environment variable defined on the client host (the one that runs `docker compose` command)
-# see https://docs.docker.com/compose/how-tos/use-secrets/ for details
+# Secrets are sourced from environment variables defined in .env file
+# Copy .env.sample to .env and fill in your values
+# See https://docs.docker.com/compose/how-tos/use-secrets/ for details
 secrets:
   password_salt:
     environment: WAKA3X_PASSWORD_SALT
