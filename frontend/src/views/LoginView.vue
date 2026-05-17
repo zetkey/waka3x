@@ -33,6 +33,21 @@ const oidcError = computed(() =>
   route.query.error?.toString().replaceAll("_", " "),
 );
 
+function isSafeAuthenticatedRedirect(path: string | undefined): path is string {
+  if (!path) return false;
+  return (
+    path.startsWith("/") &&
+    !path.startsWith("//") &&
+    !path.startsWith("/login") &&
+    !path.startsWith("/signup")
+  );
+}
+
+const redirectTarget = computed(() => {
+  const redirect = route.query.redirect?.toString();
+  return isSafeAuthenticatedRedirect(redirect) ? redirect : "/dashboard";
+});
+
 onMounted(() => {
   metaStore.fetchConfig().catch(() => undefined);
 });
@@ -40,7 +55,7 @@ onMounted(() => {
 const handleLogin = async () => {
   try {
     await authStore.login(username.value, password.value);
-    router.push("/dashboard");
+    router.push(redirectTarget.value);
   } catch {
     toast({
       title: "Login failed",
@@ -58,7 +73,7 @@ const handlePasskeyLogin = async () => {
     const response = await authApi.webAuthnLogin({ assertion_json: assertion });
     authStore.user = response.user;
     authStore.isAuthenticated = true;
-    router.push("/dashboard");
+    router.push(redirectTarget.value);
   } catch (err) {
     toast({
       title: "Passkey login failed",

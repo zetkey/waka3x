@@ -37,6 +37,21 @@ const signupAllowed = computed(() =>
   Boolean(config.value?.allow_signup || config.value?.invite_codes_enabled),
 );
 
+function isSafeAuthenticatedRedirect(path: string | undefined): path is string {
+  if (!path) return false;
+  return (
+    path.startsWith("/") &&
+    !path.startsWith("//") &&
+    !path.startsWith("/login") &&
+    !path.startsWith("/signup")
+  );
+}
+
+const redirectTarget = computed(() => {
+  const redirect = route.query.redirect?.toString();
+  return isSafeAuthenticatedRedirect(redirect) ? redirect : "/dashboard";
+});
+
 async function refreshCaptcha() {
   if (!config.value?.signup_captcha) return;
   const response = await authApi.captcha();
@@ -63,7 +78,7 @@ const handleSignup = async () => {
       captcha_id: captchaId.value || undefined,
       captcha: captcha.value || undefined,
     });
-    router.push("/dashboard");
+    router.push(redirectTarget.value);
   } catch (err) {
     toast({
       title: "Signup failed",

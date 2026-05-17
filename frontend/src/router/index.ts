@@ -1,5 +1,20 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+} from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { useMetaStore } from "@/stores/meta";
 import LandingView from "../views/LandingView.vue";
+
+declare module "vue-router" {
+  interface RouteMeta {
+    layout?: "Landing" | "Dashboard";
+    requiresAuth?: boolean;
+    guestOnly?: boolean;
+    requiresAuthWhenLeaderboardPrivate?: boolean;
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,13 +29,13 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: () => import("../views/LoginView.vue"),
-      meta: { layout: "Landing" },
+      meta: { layout: "Landing", guestOnly: true },
     },
     {
       path: "/signup",
       name: "signup",
       component: () => import("../views/SignupView.vue"),
-      meta: { layout: "Landing" },
+      meta: { layout: "Landing", guestOnly: true },
     },
     {
       path: "/setup",
@@ -56,33 +71,93 @@ const router = createRouter({
       path: "/dashboard",
       name: "dashboard",
       component: () => import("../views/HomeView.vue"),
-      meta: { layout: "Dashboard" },
+      meta: { layout: "Dashboard", requiresAuth: true },
     },
     {
       path: "/projects",
       name: "projects",
       component: () => import("../views/ProjectsView.vue"),
-      meta: { layout: "Dashboard" },
+      meta: { layout: "Dashboard", requiresAuth: true },
     },
     {
       path: "/settings",
       name: "settings",
       component: () => import("../views/SettingsView.vue"),
-      meta: { layout: "Dashboard" },
+      meta: { layout: "Dashboard", requiresAuth: true },
     },
     {
       path: "/leaderboard",
       name: "leaderboard",
       component: () => import("../views/LeaderboardView.vue"),
-      meta: { layout: "Dashboard" },
+      meta: {
+        layout: "Dashboard",
+        requiresAuthWhenLeaderboardPrivate: true,
+      },
     },
     {
       path: "/summary",
       name: "summary",
       component: () => import("../views/SummaryView.vue"),
-      meta: { layout: "Dashboard" },
+      meta: { layout: "Dashboard", requiresAuth: true },
     },
   ],
+});
+
+async function routeRequiresAuth(to: RouteLocationNormalized) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    return true;
+  }
+
+  if (
+    !to.matched.some(
+      (record) => record.meta.requiresAuthWhenLeaderboardPrivate,
+    )
+  ) {
+    return false;
+  }
+
+  const metaStore = useMetaStore();
+  try {
+    const config = await metaStore.fetchConfig();
+    return config.leaderboard_require_auth;
+  } catch {
+    return true;
+  }
+}
+
+function isSafeAuthenticatedRedirect(path: string | undefined): path is string {
+  if (!path) return false;
+  return (
+    path.startsWith("/") &&
+    !path.startsWith("//") &&
+    !path.startsWith("/login") &&
+    !path.startsWith("/signup")
+  );
+}
+
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore();
+  const requiresAuth = await routeRequiresAuth(to);
+
+  if (requiresAuth) {
+    await authStore.fetchUser();
+    if (!authStore.isAuthenticated) {
+      return {
+        name: "login",
+        query: { redirect: to.fullPath },
+      };
+    }
+  }
+
+  if (to.matched.some((record) => record.meta.guestOnly)) {
+    await authStore.fetchUser();
+    if (authStore.isAuthenticated) {
+      const redirect = to.query.redirect?.toString();
+      return isSafeAuthenticatedRedirect(redirect)
+        ? redirect
+        : { name: "dashboard" };
+    }
+  }
 });
 
 export default router;
