@@ -123,6 +123,11 @@ func (h *SummaryApiHandler) GetDetails(w http.ResponseWriter, r *http.Request) {
 		}))
 	}
 
+	hourlyActivity := []HourlyActivityResponse{}
+	if durations, err := h.durationSrvc.Get(summaryParams.From, summaryParams.To, summaryParams.User, summaryParams.Filters, nil, false); err == nil {
+		hourlyActivity = newHourlyActivityResponse(durations)
+	}
+
 	routeutils.RespondJSON(w, http.StatusOK, SummaryDetailsResponse{
 		Summary:             summary,
 		AvailableFilters:    newAvailableFiltersResponse(summaryWithoutFilter),
@@ -133,6 +138,7 @@ func (h *SummaryApiHandler) GetDetails(w http.ResponseWriter, r *http.Request) {
 		Timeline:            newTimelineResponse(timeline),
 		HourlyBreakdown:     newHourlyBreakdownResponse(hourlyBreakdown),
 		HourlyBreakdownFrom: hourlyBreakdownFrom,
+		HourlyActivity:      hourlyActivity,
 		UserFirstData:       firstData,
 		DataRetentionMonths: h.config.App.DataRetentionMonths,
 		UserDataExpiring: h.config.Subscriptions.Enabled &&
@@ -143,6 +149,22 @@ func (h *SummaryApiHandler) GetDetails(w http.ResponseWriter, r *http.Request) {
 		ProjectDetails: summaryParams.IsProjectDetails(),
 		Project:        summaryParams.GetProjectFilter(),
 	})
+}
+
+func newHourlyActivityResponse(durations models.Durations) []HourlyActivityResponse {
+	totals := make([]int64, 24)
+	for _, duration := range durations {
+		totals[duration.Time.T().Hour()] += int64(duration.Duration / time.Second)
+	}
+
+	response := make([]HourlyActivityResponse, 0, len(totals))
+	for hour, duration := range totals {
+		response = append(response, HourlyActivityResponse{
+			Hour:     hour,
+			Duration: duration,
+		})
+	}
+	return response
 }
 
 func (h *SummaryApiHandler) fetchSplitSummaries(params *models.SummaryParams) ([]*models.Summary, error) {
@@ -175,7 +197,7 @@ func newTimelineResponse(timeline []*view.TimelineViewModel) []TimelineResponse 
 		for _, project := range day.Projects {
 			projects = append(projects, TimelineItemResponse{
 				Name:     project.Name,
-				Duration: int64(project.Duration / time.Second),
+				Duration: int64(project.Duration),
 			})
 		}
 		response = append(response, TimelineResponse{

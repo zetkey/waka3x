@@ -77,30 +77,44 @@ const totalSeconds = computed(
   () => summary.value?.projects.reduce((acc, p) => acc + p.total, 0) || 0,
 );
 
+function normalizeCategoryKey(key: string) {
+  return key.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
 function categoryTotal(key: string) {
+  const wanted = normalizeCategoryKey(key);
   return (
-    summary.value?.categories.find(
-      (category) => category.key.toLowerCase() === key,
-    )?.total || 0
+    summary.value?.categories.reduce(
+      (acc, category) =>
+        normalizeCategoryKey(category.key) === wanted
+          ? acc + category.total
+          : acc,
+      0,
+    ) || 0
   );
 }
 
-const aiCodingRatio = computed(() => {
-  if (typeof details.value?.ai_coding_ratio === "number") {
-    return details.value.ai_coding_ratio;
-  }
-
+const categoryAiCodingRatio = computed(() => {
   const aiCoding = categoryTotal("ai coding");
   const coding = categoryTotal("coding");
   const total = aiCoding + coding;
   if (!total) return 0;
 
-  return Math.round((aiCoding / total) * 100) / 100;
+  return Math.round((aiCoding / total) * 10000) / 10000;
 });
 
-const aiCodingPercentage = computed(
-  () => `${Math.round(aiCodingRatio.value * 100)} %`,
-);
+const aiCodingRatio = computed(() => {
+  const apiRatio = details.value?.ai_coding_ratio;
+  if (typeof apiRatio === "number" && apiRatio > 0) return apiRatio;
+
+  return categoryAiCodingRatio.value;
+});
+
+const aiCodingPercentage = computed(() => {
+  const percentage = aiCodingRatio.value * 100;
+  if (percentage > 0 && percentage < 1) return "< 1 %";
+  return `${Math.round(percentage)} %`;
+});
 
 const kpis = computed(() => {
   const s = summary.value;

@@ -227,6 +227,11 @@ type HourlyBreakdownProjectResponse struct {
 	Items   []HourlyBreakdownItemResponse `json:"items"`
 }
 
+type HourlyActivityResponse struct {
+	Hour     int   `json:"hour"`
+	Duration int64 `json:"duration"`
+}
+
 type SummaryDetailsResponse struct {
 	Summary             *models.Summary                  `json:"summary"`
 	AvailableFilters    AvailableFiltersResponse         `json:"available_filters"`
@@ -237,6 +242,7 @@ type SummaryDetailsResponse struct {
 	Timeline            []TimelineResponse               `json:"timeline"`
 	HourlyBreakdown     []HourlyBreakdownProjectResponse `json:"hourly_breakdown"`
 	HourlyBreakdownFrom time.Time                        `json:"hourly_breakdown_from"`
+	HourlyActivity      []HourlyActivityResponse         `json:"hourly_activity"`
 	UserFirstData       time.Time                        `json:"user_first_data"`
 	DataRetentionMonths int                              `json:"data_retention_months"`
 	UserDataExpiring    bool                             `json:"user_data_expiring"`

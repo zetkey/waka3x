@@ -243,6 +243,11 @@ export interface HourlyBreakdownProject {
   items: HourlyBreakdownItem[];
 }
 
+export interface HourlyActivity {
+  hour: number;
+  duration: DurationSeconds;
+}
+
 export interface SummaryDetails {
   summary: Summary;
   available_filters: AvailableFilters;
@@ -253,6 +258,7 @@ export interface SummaryDetails {
   timeline: TimelineDay[] | null;
   hourly_breakdown: HourlyBreakdownProject[];
   hourly_breakdown_from: ISODateTime;
+  hourly_activity: HourlyActivity[];
   user_first_data: ISODateTime;
   data_retention_months: number;
   user_data_expiring: boolean;

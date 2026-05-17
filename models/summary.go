@@ -4,9 +4,9 @@ import (
 	"errors"
 	"math"
 	"sort"
+	"strings"
 	"time"
 
-	"github.com/duke-git/lancet/v2/condition"
 	"github.com/duke-git/lancet/v2/mathutil"
 	"github.com/duke-git/lancet/v2/slice"
 )
@@ -293,11 +293,29 @@ func (s *Summary) FillBy(fromType uint8, toType uint8) {
 }
 
 func (s *Summary) CategoryRatio(c1 string, cAll ...string) float64 {
-	total1 := float64(s.TotalTimeByKey(SummaryCategory, c1))
+	total1 := float64(s.totalCategoryTimeByNormalizedKey(c1))
 	totalAll := mathutil.Sum(slice.Map(cAll, func(i int, c string) float64 {
-		return float64(s.TotalTimeByKey(SummaryCategory, c))
+		return float64(s.totalCategoryTimeByNormalizedKey(c))
 	})...)
-	return mathutil.RoundToFloat(condition.Ternary(totalAll > 0, total1/totalAll, 0), 2)
+	if totalAll <= 0 {
+		return 0
+	}
+	return mathutil.RoundToFloat(total1/totalAll, 4)
+}
+
+func (s *Summary) totalCategoryTimeByNormalizedKey(key string) (timeSum time.Duration) {
+	wanted := normalizeSummaryKey(key)
+	for _, item := range s.Categories {
+		if normalizeSummaryKey(item.Key) != wanted {
+			continue
+		}
+		timeSum += item.Total * time.Second
+	}
+	return timeSum
+}
+
+func normalizeSummaryKey(key string) string {
+	return strings.Join(strings.Fields(strings.ToLower(key)), " ")
 }
 
 func (s *Summary) TotalTime() time.Duration {

@@ -108,6 +108,44 @@ func TestSummary_TotalTimeByFilters(t *testing.T) {
 	assert.Zero(t, sut.TotalTimeByFilter(filters3))
 }
 
+func TestSummary_CategoryRatio_NormalizesCategoryNames(t *testing.T) {
+	sut := &Summary{
+		Categories: []*SummaryItem{
+			{
+				Type:  SummaryCategory,
+				Key:   "AI Coding",
+				Total: 15 * time.Minute / time.Second,
+			},
+			{
+				Type:  SummaryCategory,
+				Key:   "coding",
+				Total: 45 * time.Minute / time.Second,
+			},
+		},
+	}
+
+	assert.Equal(t, 0.25, sut.CategoryRatio("ai coding", "ai coding", "coding"))
+}
+
+func TestSummary_CategoryRatio_KeepsSmallNonZeroRatios(t *testing.T) {
+	sut := &Summary{
+		Categories: []*SummaryItem{
+			{
+				Type:  SummaryCategory,
+				Key:   "ai coding",
+				Total: 10 * time.Second / time.Second,
+			},
+			{
+				Type:  SummaryCategory,
+				Key:   "coding",
+				Total: 1 * time.Hour / time.Second,
+			},
+		},
+	}
+
+	assert.Equal(t, 0.0028, sut.CategoryRatio("ai coding", "ai coding", "coding"))
+}
+
 func TestSummary_WithResolvedAliases(t *testing.T) {
 	testDuration1, testDuration2, testDuration3, testDuration4 := 10*time.Minute, 5*time.Minute, 1*time.Minute, 20*time.Minute
 
