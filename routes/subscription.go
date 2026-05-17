@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log/slog"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/leandro-lugaresi/hub"
-	conf "github.com/zetkey/waka3x/config"
-	"github.com/zetkey/waka3x/middlewares"
-	"github.com/zetkey/waka3x/models"
-	routeutils "github.com/zetkey/waka3x/routes/utils"
-	"github.com/zetkey/waka3x/services"
 	"github.com/stripe/stripe-go/v74"
 	stripePortalSession "github.com/stripe/stripe-go/v74/billingportal/session"
 	stripeCheckoutSession "github.com/stripe/stripe-go/v74/checkout/session"
@@ -18,11 +19,11 @@ import (
 	stripePrice "github.com/stripe/stripe-go/v74/price"
 	stripeSubscription "github.com/stripe/stripe-go/v74/subscription"
 	"github.com/stripe/stripe-go/v74/webhook"
-	"io"
-	"log/slog"
-	"net/http"
-	"strings"
-	"time"
+	conf "github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/middlewares"
+	"github.com/zetkey/waka3x/models"
+	routeutils "github.com/zetkey/waka3x/routes/utils"
+	"github.com/zetkey/waka3x/services"
 )
 
 /*
@@ -119,10 +120,6 @@ func (h *SubscriptionHandler) RegisterRoutes(router chi.Router) {
 }
 
 func (h *SubscriptionHandler) PostCheckout(w http.ResponseWriter, r *http.Request) {
-	if h.config.IsDev() {
-		loadTemplates()
-	}
-
 	user := middlewares.GetPrincipal(r)
 	if user.Email == "" {
 		routeutils.SetError(r, w, "missing e-mail address")
@@ -168,10 +165,6 @@ func (h *SubscriptionHandler) PostCheckout(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *SubscriptionHandler) PostPortal(w http.ResponseWriter, r *http.Request) {
-	if h.config.IsDev() {
-		loadTemplates()
-	}
-
 	user := middlewares.GetPrincipal(r)
 	if user.StripeCustomerId == "" {
 		routeutils.SetError(r, w, "no subscription found with your e-mail address, please contact us!")
@@ -285,7 +278,7 @@ func (h *SubscriptionHandler) PostWebhook(w http.ResponseWriter, r *http.Request
 }
 
 func (h *SubscriptionHandler) GetCheckoutSuccess(w http.ResponseWriter, r *http.Request) {
-	routeutils.SetSuccess(r, w, "you have successfully subscribed to Wakapi!")
+	routeutils.SetSuccess(r, w, "you have successfully subscribed to Waka3x!")
 	http.Redirect(w, r, fmt.Sprintf("%s/settings", h.config.Server.BasePath), http.StatusFound)
 }
 

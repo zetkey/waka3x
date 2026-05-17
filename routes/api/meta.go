@@ -11,7 +11,6 @@ import (
 	conf "github.com/zetkey/waka3x/config"
 	"github.com/zetkey/waka3x/helpers"
 	"github.com/zetkey/waka3x/models"
-	"github.com/zetkey/waka3x/models/view"
 	routeutils "github.com/zetkey/waka3x/routes/utils"
 	"github.com/zetkey/waka3x/services"
 )
@@ -84,7 +83,7 @@ func (h *MetaApiHandler) GetHome(w http.ResponseWriter, r *http.Request) {
 		totalHours      int
 		totalUsers      int
 		currentlyOnline int
-		newsbox         view.Newsbox
+		newsbox         NewsboxResponse
 	)
 
 	if kv, err := h.keyValueSrvc.GetString(conf.KeyLatestTotalTime); err == nil && kv != nil && kv.Value != "" {

@@ -784,7 +784,7 @@ func (h *SettingsApiHandler) buildSettingsResponse(user *models.User, inviteLink
 	}
 	_ = h.webAuthnSrvc.LoadCredentialIntoUser(user)
 
-	readmeCardTitle := "Wakapi.dev Stats"
+	readmeCardTitle := "Waka3x Stats"
 	if err, maxRange := helpers.ResolveMaximumRange(user.ShareDataMaxDays); err == nil {
 		readmeCardTitle += fmt.Sprintf(" (%v)", maxRange.GetHumanReadable())
 	}

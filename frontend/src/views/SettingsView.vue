@@ -189,7 +189,7 @@ const readmeStatsUrl = computed(() => {
     icon_color: "2F855A",
     text_color: "ffffff",
     custom_title:
-      settings.value?.readme_card_custom_title || "Wakapi.dev Stats",
+      settings.value?.readme_card_custom_title || "Waka3x Stats",
     layout: "compact",
   });
 
@@ -962,7 +962,7 @@ async function disconnectWakatime() {
               GitHub Readme Stats
             </CardTitle>
             <CardDescription>
-              Build a GitHub Readme Stats WakaTime card backed by the Wakapi
+              Build a GitHub Readme Stats WakaTime card backed by Waka3x
               stats endpoint.
             </CardDescription>
           </CardHeader>

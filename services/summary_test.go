@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/leandro-lugaresi/hub"
-	"github.com/zetkey/waka3x/config"
-	"github.com/zetkey/waka3x/mocks"
-	"github.com/zetkey/waka3x/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/zetkey/waka3x/config"
+	"github.com/zetkey/waka3x/mocks"
+	"github.com/zetkey/waka3x/models"
 )
 
 const (
@@ -730,9 +730,7 @@ func (suite *SummaryServiceTestSuite) TestSummaryService_HeartbeatCreateEvent_Cl
 		},
 	})
 
-	assert.Eventually(suite.T(), func() bool {
-		return suite.SummaryRepository.AssertCalled(suite.T(), "DeleteByUserAfter", TestUserId, historicalHeartbeatTime)
-	}, 2*time.Second, 20*time.Millisecond)
+	suite.assertSummaryRepositoryCalledEventually("DeleteByUserAfter", TestUserId, historicalHeartbeatTime)
 
 	suite.SummaryRepository.AssertExpectations(suite.T())
 	_ = sut
@@ -760,9 +758,7 @@ func (suite *SummaryServiceTestSuite) TestSummaryService_HeartbeatCreateEvent_Ke
 		},
 	})
 
-	assert.Eventually(suite.T(), func() bool {
-		return suite.SummaryRepository.AssertCalled(suite.T(), "GetLastBySingleUser", TestUserId)
-	}, 2*time.Second, 20*time.Millisecond)
+	suite.assertSummaryRepositoryCalledEventually("GetLastBySingleUser", TestUserId)
 
 	suite.SummaryRepository.AssertNotCalled(suite.T(), "DeleteByUserAfter", mock.Anything, mock.Anything)
 	_ = sut
@@ -793,9 +789,7 @@ func (suite *SummaryServiceTestSuite) TestSummaryService_HeartbeatCreateEvent_Sk
 		},
 	})
 
-	assert.Eventually(suite.T(), func() bool {
-		return suite.SummaryRepository.AssertCalled(suite.T(), "GetLastBySingleUser", TestUserId)
-	}, 2*time.Second, 20*time.Millisecond)
+	suite.assertSummaryRepositoryCalledEventually("GetLastBySingleUser", TestUserId)
 
 	eventBus.Publish(hub.Message{
 		Name: config.EventHeartbeatCreate,
@@ -821,6 +815,21 @@ func (suite *SummaryServiceTestSuite) createSut() (*SummaryService, *hub.Hub) {
 	eventBus := hub.New()
 	config.SetEventBus(eventBus)
 	return NewSummaryService(suite.SummaryRepository, suite.HeartbeatService, suite.DurationService, suite.AliasService, suite.ProjectLabelService), eventBus
+}
+
+func (suite *SummaryServiceTestSuite) assertSummaryRepositoryCalledEventually(methodName string, arguments ...interface{}) {
+	suite.T().Helper()
+	assert.Eventually(suite.T(), func() bool {
+		for _, call := range suite.SummaryRepository.Calls {
+			if call.Method != methodName {
+				continue
+			}
+			if _, diffCount := call.Arguments.Diff(arguments); diffCount == 0 {
+				return true
+			}
+		}
+		return false
+	}, 2*time.Second, 20*time.Millisecond)
 }
 
 func filterDurations(from, to time.Time, durations models.Durations) models.Durations {

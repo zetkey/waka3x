@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -10,13 +11,12 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/zetkey/waka3x/config"
 	"github.com/zetkey/waka3x/middlewares"
 	"github.com/zetkey/waka3x/mocks"
 	"github.com/zetkey/waka3x/models"
-	"github.com/zetkey/waka3x/routes"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 var (
@@ -63,7 +63,7 @@ func TestBadgeHandler_Get(t *testing.T) {
 			rec := httptest.NewRecorder()
 
 			req := httptest.NewRequest(http.MethodGet, "/api/badge/{user}/interval:week/language:go", nil)
-			req = routes.WithUrlParam(req, "user", "user1")
+			req = withURLParam(req, "user", "user1")
 
 			router.ServeHTTP(rec, req)
 			res := rec.Result()
@@ -84,7 +84,7 @@ func TestBadgeHandler_Get(t *testing.T) {
 			rec := httptest.NewRecorder()
 
 			req := httptest.NewRequest(http.MethodGet, "/api/badge/{user}/interval:last_year/language:go", nil)
-			req = routes.WithUrlParam(req, "user", "user1")
+			req = withURLParam(req, "user", "user1")
 
 			router.ServeHTTP(rec, req)
 			res := rec.Result()
@@ -104,7 +104,7 @@ func TestBadgeHandler_Get(t *testing.T) {
 			rec := httptest.NewRecorder()
 
 			req := httptest.NewRequest(http.MethodGet, "/api/badge/{user}/interval:year/project:foo", nil)
-			req = routes.WithUrlParam(req, "user", "user1")
+			req = withURLParam(req, "user", "user1")
 
 			router.ServeHTTP(rec, req)
 			res := rec.Result()
@@ -120,6 +120,14 @@ func TestBadgeHandler_Get(t *testing.T) {
 			assert.False(t, strings.HasPrefix(string(data), "<svg"))
 		})
 	})
+}
+
+func withURLParam(r *http.Request, key, value string) *http.Request {
+	r.URL.RawPath = strings.Replace(r.URL.RawPath, "{"+key+"}", value, 1)
+	r.URL.Path = strings.Replace(r.URL.Path, "{"+key+"}", value, 1)
+	rctx := chi.NewRouteContext()
+	rctx.URLParams.Add(key, value)
+	return r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
 }
 
 func TestBadgeHandler_EntityPattern(t *testing.T) {

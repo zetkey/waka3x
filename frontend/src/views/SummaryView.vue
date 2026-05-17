@@ -252,7 +252,7 @@ function exportJson() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "wakapi-summary.json";
+  link.download = "waka3x-summary.json";
   link.click();
   URL.revokeObjectURL(url);
 }

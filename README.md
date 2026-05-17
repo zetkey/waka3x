@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="static/assets/images/logo-gh.png" width="350">
+  <img src="docs/assets/logo-gh.png" width="350">
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
 </div>
 
 <p align="center">
-  <img src="static/assets/images/screenshot.webp" width="500px">
+  <img src="docs/assets/screenshot.webp" width="500px">
 </p>
 
 > [!IMPORTANT]

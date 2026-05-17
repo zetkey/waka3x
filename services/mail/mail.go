@@ -3,16 +3,17 @@ package mail
 import (
 	"bytes"
 	"fmt"
+	"html/template"
+	"strings"
 	"time"
 
+	"github.com/duke-git/lancet/v2/datetime"
+	conf "github.com/zetkey/waka3x/config"
 	"github.com/zetkey/waka3x/helpers"
 	"github.com/zetkey/waka3x/models"
-	"github.com/zetkey/waka3x/routes"
 	"github.com/zetkey/waka3x/services"
+	"github.com/zetkey/waka3x/services/mail/templates"
 	"github.com/zetkey/waka3x/utils"
-	"github.com/zetkey/waka3x/views/mail"
-
-	conf "github.com/zetkey/waka3x/config"
 )
 
 const (
@@ -21,11 +22,11 @@ const (
 	tplNameWakatimeFailureNotification = "wakatime_connection_failure"
 	tplNameReport                      = "report"
 	tplNameSubscriptionNotification    = "subscription_expiring"
-	subjectPasswordReset               = "Wakapi - Password Reset"
-	subjectImportNotification          = "Wakapi - Data Import Finished"
-	subjectWakatimeFailureNotification = "Wakapi - WakaTime Connection Failure"
-	subjectReport                      = "Wakapi - Report from %s"
-	subjectSubscriptionNotification    = "Wakapi - Subscription expiring / expired"
+	subjectPasswordReset               = "Waka3x - Password Reset"
+	subjectImportNotification          = "Waka3x - Data Import Finished"
+	subjectWakatimeFailureNotification = "Waka3x - WakaTime Connection Failure"
+	subjectReport                      = "Waka3x - Report from %s"
+	subjectSubscriptionNotification    = "Waka3x - Subscription expiring / expired"
 )
 
 type SendingService interface {
@@ -51,13 +52,13 @@ func NewMailService() services.IMailService {
 	}
 
 	// Use local file system when in 'dev' environment, go embed file system otherwise
-	templateFs := conf.ChooseFS("views/mail", mail.TemplateFiles)
-	templates, err := utils.LoadTemplates(templateFs, routes.DefaultTemplateFuncs())
+	templateFS := conf.ChooseFS("services/mail/templates", templates.TemplateFiles)
+	loadedTemplates, err := utils.LoadTemplates(templateFS, defaultTemplateFuncs())
 	if err != nil {
 		panic(err)
 	}
 
-	return &MailService{sendingService: sendingService, config: config, templates: templates}
+	return &MailService{sendingService: sendingService, config: config, templates: loadedTemplates}
 }
 
 func (m *MailService) SendPasswordReset(recipient *models.User, resetLink string) error {
@@ -184,4 +185,30 @@ func (m *MailService) getSubscriptionNotificationTemplate(data SubscriptionNotif
 
 func (m *MailService) fmtName(name string) string {
 	return fmt.Sprintf("%s.tpl.html", name)
+}
+
+func defaultTemplateFuncs() template.FuncMap {
+	return template.FuncMap{
+		"json":           utils.Json,
+		"date":           helpers.FormatDateHuman,
+		"datetime":       helpers.FormatDateTimeHuman,
+		"datetimetz":     helpers.FormatDateTimeHumanTZ,
+		"simpledate":     helpers.FormatDate,
+		"simpledatetime": helpers.FormatDateTime,
+		"duration":       helpers.FmtWakatimeDuration,
+		"floordate":      datetime.BeginOfDay,
+		"ceildate":       utils.CeilDate,
+		"title":          strings.Title,
+		"join":           strings.Join,
+		"lower":          strings.ToLower,
+		"htmlSafe": func(html string) template.HTML {
+			return template.HTML(html)
+		},
+		"urlSafe": func(s string) template.URL {
+			return template.URL(s)
+		},
+		"cssSafe": func(s string) template.CSS {
+			return template.CSS(s)
+		},
+	}
 }

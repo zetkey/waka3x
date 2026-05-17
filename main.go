@@ -14,11 +14,9 @@ import (
 	"strings"
 	"time"
 
-	// "github.com/duke-git/lancet/v2/condition"
 	_ "github.com/glebarez/sqlite"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/lpar/gzipped/v2"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/zetkey/waka3x/utils"
 	_ "gorm.io/driver/mysql"
@@ -219,8 +217,6 @@ func main() {
 		go leaderboardService.Schedule()
 	}
 
-	routes.Init()
-
 	// API Handlers
 	rootApiHandler := api.NewApiRootHandler()
 	healthApiHandler := api.NewHealthApiHandler(db)
@@ -263,17 +259,7 @@ func main() {
 	wakatimeV1UserAgentsHandler := wtV1Routes.NewUserAgentsHandler(userService, heartbeatService)
 	shieldV1BadgeHandler := shieldsV1Routes.NewBadgeHandler(summaryService, userService)
 
-	// MVC Handlers
-	// summaryHandler := routes.NewSummaryHandler(summaryService, userService, heartbeatService, durationService, aliasService)
-	// settingsHandler := routes.NewSettingsHandler(userService, heartbeatService, durationService, summaryService, aliasService, aggregationService, languageMappingService, projectLabelService, keyValueService, mailService, apiKeyService, webAuthnService)
 	subscriptionHandler := routes.NewSubscriptionHandler(userService, mailService, keyValueService)
-	// projectsHandler := routes.NewProjectsHandler(userService, heartbeatService)
-	// homeHandler := routes.NewHomeHandler(userService, keyValueService)
-	// loginHandler := routes.NewLoginHandler(userService, mailService, keyValueService, webAuthnService)
-	// imprintHandler := routes.NewImprintHandler(keyValueService)
-	// setupHandler := routes.NewSetupHandler(userService)
-	// leaderboardHandler := condition.Ternary[bool, routes.Handler](config.App.LeaderboardEnabled, routes.NewLeaderboardHandler(userService, leaderboardService), routes.NewNoopHandler())
-	// miscHandler := routes.NewMiscHandler(userService)
 
 	// Setup Routing
 	router := chi.NewRouter()
@@ -304,20 +290,6 @@ func main() {
 	// Hook sub routers
 	router.Mount("/", rootRouter)
 	router.Mount("/api", apiRouter)
-
-	// Route registrations (Disabled SSR in favor of SPA)
-	/*
-		homeHandler.RegisterRoutes(rootRouter)
-		loginHandler.RegisterRoutes(rootRouter)
-		imprintHandler.RegisterRoutes(rootRouter)
-		setupHandler.RegisterRoutes(rootRouter)
-		summaryHandler.RegisterRoutes(rootRouter)
-		leaderboardHandler.RegisterRoutes(rootRouter)
-		projectsHandler.RegisterRoutes(rootRouter)
-		settingsHandler.RegisterRoutes(rootRouter)
-		subscriptionHandler.RegisterRoutes(rootRouter)
-		miscHandler.RegisterRoutes(rootRouter)
-	*/
 
 	// API route registrations
 	rootRouter.Get("/oidc/{provider}/login", authApiHandler.GetOidcLogin)
@@ -354,16 +326,9 @@ func main() {
 	// https://github.com/golang/go/issues/43431
 	embeddedStatic, _ := fs.Sub(staticFiles, "static")
 	static := conf.ChooseFS("static", embeddedStatic)
-
-	assetsStaticFs := fsutils.NewExistsHttpFS(fsutils.NewExistsFS(static).WithCache(!config.IsDev()))
-	assetsFileServer := http.FileServer(assetsStaticFs)
-	if !config.IsDev() {
-		assetsFileServer = gzipped.FileServer(assetsStaticFs)
-	}
 	staticFileServer := http.FileServer(http.FS(fsutils.NeuteredFileSystem{FS: static}))
 
 	router.Get("/contribute.json", staticFileServer.ServeHTTP)
-	router.Get("/assets/*", assetsFileServer.ServeHTTP)
 	router.Get("/swagger-ui", http.RedirectHandler("swagger-ui/", http.StatusMovedPermanently).ServeHTTP) // https://github.com/swaggo/http-swagger/issues/44
 	router.Get("/swagger-ui/*", httpSwagger.WrapHandler)
 

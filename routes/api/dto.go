@@ -302,6 +302,11 @@ type HomeStatsResponse struct {
 	Newsbox         interface{} `json:"newsbox,omitempty"`
 }
 
+type NewsboxResponse struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
 type ImprintResponse struct {
 	HTML string `json:"html"`
 }

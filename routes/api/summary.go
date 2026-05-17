@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/zetkey/waka3x/helpers"
 	"github.com/zetkey/waka3x/models"
-	"github.com/zetkey/waka3x/models/view"
 	routeutils "github.com/zetkey/waka3x/routes/utils"
 	"net/http"
 
@@ -104,23 +103,23 @@ func (h *SummaryApiHandler) GetDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var timeline []*view.TimelineViewModel
+	var timeline []timelineDay
 	if rangeDays := summaryParams.RangeDays(); rangeDays >= dailyStatsMinRangeDays && rangeDays <= dailyStatsMaxRangeDays {
 		if dailyStatsSummaries, err := h.fetchSplitSummaries(summaryParams); err == nil {
-			timeline = view.NewTimelineViewModel(dailyStatsSummaries)
+			timeline = newTimelineDays(dailyStatsSummaries)
 		}
 	}
 
-	var hourlyBreakdown view.HourlyBreakdownsViewModel
+	var hourlyBreakdown []hourlyBreakdownProject
 	hourlyBreakdownFrom := summaryParams.From
 	if summaryParams.RangeDays() > 1 {
 		hourlyBreakdownFrom = summaryParams.To.Add(-24 * time.Hour)
 	}
 	if durations, err := h.durationSrvc.Get(hourlyBreakdownFrom, summaryParams.To, summaryParams.User, summaryParams.Filters, nil, false); err == nil && len(durations) <= 200 {
-		hourlyBreakdown = view.NewHourlyBreakdownViewModel(view.NewHourlyBreakdownItems(durations, func(t uint8, k string) string {
+		hourlyBreakdown = newHourlyBreakdownProjects(durations, func(t uint8, k string) string {
 			s, _ := h.aliasSrvc.GetAliasOrDefault(user.ID, t, k)
 			return s
-		}))
+		})
 	}
 
 	hourlyActivity := []HourlyActivityResponse{}
@@ -190,37 +189,103 @@ func newAvailableFiltersResponse(summary *models.Summary) AvailableFiltersRespon
 	}
 }
 
-func newTimelineResponse(timeline []*view.TimelineViewModel) []TimelineResponse {
+type timelineDay struct {
+	date     time.Time
+	projects []timelineProject
+}
+
+type timelineProject struct {
+	name     string
+	duration time.Duration
+}
+
+type hourlyBreakdownProject struct {
+	project string
+	items   []hourlyBreakdownItem
+}
+
+type hourlyBreakdownItem struct {
+	fromTime time.Time
+	duration time.Duration
+	entity   string
+	project  string
+}
+
+func newTimelineDays(summaries []*models.Summary) []timelineDay {
+	timeline := make([]timelineDay, 0, len(summaries))
+	for _, summary := range summaries {
+		projects := make([]timelineProject, 0, len(summary.Projects))
+		for _, project := range summary.Projects {
+			projects = append(projects, timelineProject{
+				name:     project.Key,
+				duration: project.Total,
+			})
+		}
+		timeline = append(timeline, timelineDay{
+			date:     summary.FromTime.T(),
+			projects: projects,
+		})
+	}
+	return timeline
+}
+
+func newHourlyBreakdownProjects(durations models.Durations, resolve models.AliasResolver) []hourlyBreakdownProject {
+	grouped := make(map[string][]hourlyBreakdownItem)
+	for _, duration := range durations {
+		project := resolve(models.SummaryProject, duration.Project)
+		item := hourlyBreakdownItem{
+			fromTime: duration.Time.T(),
+			duration: duration.Duration,
+			entity:   resolve(models.SummaryEntity, duration.Entity),
+			project:  project,
+		}
+		grouped[project] = append(grouped[project], item)
+	}
+
+	projects := make([]hourlyBreakdownProject, 0, len(grouped))
+	for project, items := range grouped {
+		slice.SortBy(items, func(i, j hourlyBreakdownItem) bool {
+			return i.fromTime.Before(j.fromTime)
+		})
+		projects = append(projects, hourlyBreakdownProject{
+			project: project,
+			items:   items,
+		})
+	}
+	return projects
+}
+
+func newTimelineResponse(timeline []timelineDay) []TimelineResponse {
 	response := make([]TimelineResponse, 0, len(timeline))
 	for _, day := range timeline {
-		projects := make([]TimelineItemResponse, 0, len(day.Projects))
-		for _, project := range day.Projects {
+		projects := make([]TimelineItemResponse, 0, len(day.projects))
+		for _, project := range day.projects {
 			projects = append(projects, TimelineItemResponse{
-				Name:     project.Name,
-				Duration: int64(project.Duration),
+				Name:     project.name,
+				Duration: int64(project.duration),
 			})
 		}
 		response = append(response, TimelineResponse{
-			Date:     day.Date,
+			Date:     day.date,
 			Projects: projects,
 		})
 	}
 	return response
 }
 
-func newHourlyBreakdownResponse(breakdown view.HourlyBreakdownsViewModel) []HourlyBreakdownProjectResponse {
+func newHourlyBreakdownResponse(breakdown []hourlyBreakdownProject) []HourlyBreakdownProjectResponse {
 	response := make([]HourlyBreakdownProjectResponse, 0, len(breakdown))
 	for _, project := range breakdown {
-		items := make([]HourlyBreakdownItemResponse, 0, len(project.Items))
-		for _, item := range project.Items {
+		items := make([]HourlyBreakdownItemResponse, 0, len(project.items))
+		for _, item := range project.items {
 			items = append(items, HourlyBreakdownItemResponse{
-				FromTime: item.FromTime,
-				Duration: int64(item.Duration / time.Second),
-				Entity:   item.Entity,
+				FromTime: item.fromTime,
+				Duration: int64(item.duration / time.Second),
+				Entity:   item.entity,
 			})
 		}
 		response = append(response, HourlyBreakdownProjectResponse{
-			Project: project.Project,
+			Project: project.project,
 			Items:   items,
 		})
 	}

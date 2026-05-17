@@ -13,11 +13,11 @@ import (
 	"github.com/alitto/pond/v2"
 	"github.com/duke-git/lancet/v2/condition"
 	"github.com/duke-git/lancet/v2/datetime"
+	"github.com/patrickmn/go-cache"
 	"github.com/zetkey/waka3x/config"
 	"github.com/zetkey/waka3x/helpers"
 	"github.com/zetkey/waka3x/models"
 	"github.com/zetkey/waka3x/utils"
-	"github.com/patrickmn/go-cache"
 )
 
 const (
@@ -141,8 +141,8 @@ func (s *ActivityService) getChartPastYear(user *models.User, darkTheme, hideAtt
 
 	if !hideAttribution {
 		canvas.Group()
-		canvas.Title("Wakapi.dev")
-		canvas.Image(w-60, h-24, 60, 24, "https://wakapi.dev/assets/images/logo-gh.svg")
+		canvas.Title("Waka3x")
+		canvas.Text(w-54, h-8, "Waka3x")
 		canvas.Gend()
 	}
 
