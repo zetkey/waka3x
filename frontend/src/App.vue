@@ -29,8 +29,8 @@ const currentLayout = computed(() => {
 </script>
 
 <template>
+  <Toaster />
   <component :is="currentLayout">
-    <Toaster />
     <RouterView />
   </component>
 </template>

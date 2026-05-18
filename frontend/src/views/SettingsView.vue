@@ -263,10 +263,8 @@ function notifySuccess(message: string) {
 }
 
 function notifyError(err: unknown, fallback: string) {
-  toast({
-    title: "Action failed",
+  toast.error("Action failed", {
     description: getApiErrorMessage(err, fallback),
-    variant: "destructive",
   });
 }
 

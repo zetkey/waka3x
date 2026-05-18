@@ -80,11 +80,9 @@ const handleSignup = async () => {
     });
     router.push(redirectTarget.value);
   } catch (err) {
-    toast({
-      title: "Signup failed",
+    toast.error("Signup failed", {
       description:
         authStore.error || getApiErrorMessage(err, "Could not create account."),
-      variant: "destructive",
     });
     refreshCaptcha().catch(() => undefined);
   }

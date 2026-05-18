@@ -57,10 +57,8 @@ const handleLogin = async () => {
     await authStore.login(username.value, password.value);
     router.push(redirectTarget.value);
   } catch {
-    toast({
-      title: "Login failed",
+    toast.error("Login failed", {
       description: authStore.error || "Please check your credentials.",
-      variant: "destructive",
     });
   }
 };
@@ -75,15 +73,13 @@ const handlePasskeyLogin = async () => {
     authStore.isAuthenticated = true;
     router.push(redirectTarget.value);
   } catch (err) {
-    toast({
-      title: "Passkey login failed",
+    toast.error("Passkey login failed", {
       description: getApiErrorMessage(
         err,
         err instanceof Error
           ? err.message
           : "Could not authenticate with passkey.",
       ),
-      variant: "destructive",
     });
   } finally {
     passkeyLoading.value = false;

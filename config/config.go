@@ -17,6 +17,7 @@ import (
 	"encoding/gob"
 	"log/slog"
 	"net/url"
+	"path/filepath"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/securecookie"
@@ -30,7 +31,9 @@ import (
 )
 
 const (
-	DefaultConfigPath = "config.yml"
+	DefaultConfigPath          = "config.yml"
+	DefaultConfigReferencePath = "config.default.yml"
+	LocalConfigPath            = "config.local.yml"
 
 	SQLDialectMysql    = "mysql"
 	SQLDialectPostgres = "postgres"
@@ -589,7 +592,7 @@ func Load(configFlag string, version string) *Config {
 	renameEnvVars()
 
 	config := &Config{}
-	if err := configor.New(&configor.Config{ENVPrefix: "WAKAPI"}).Load(config, configFlag); err != nil {
+	if err := configor.New(&configor.Config{ENVPrefix: "WAKAPI", Silent: true}).Load(config, resolveConfigFiles(configFlag)...); err != nil {
 		Log().Fatal("failed to read config", err)
 	}
 
@@ -741,6 +744,48 @@ func Load(configFlag string, version string) *Config {
 	InitWebAuthn(config)
 
 	return Get()
+}
+
+func resolveConfigFiles(configFlag string) []string {
+	loadOrder := make([]string, 0, 3)
+	appendConfigFile := func(path string) {
+		path = strings.TrimSpace(path)
+		if path == "" || !regularFileExists(path) {
+			return
+		}
+		for _, existing := range loadOrder {
+			if sameConfigPath(existing, path) {
+				return
+			}
+		}
+		loadOrder = append(loadOrder, path)
+	}
+
+	appendConfigFile(DefaultConfigReferencePath)
+	appendConfigFile(configFlag)
+	appendConfigFile(LocalConfigPath)
+
+	// Configor internally reverses its file arguments before loading them, so
+	// pass the desired layered order in reverse: defaults, config, local.
+	files := make([]string, 0, len(loadOrder))
+	for i := len(loadOrder) - 1; i >= 0; i-- {
+		files = append(files, loadOrder[i])
+	}
+	return files
+}
+
+func regularFileExists(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.Mode().IsRegular()
+}
+
+func sameConfigPath(a, b string) bool {
+	aAbs, aErr := filepath.Abs(a)
+	bAbs, bErr := filepath.Abs(b)
+	if aErr != nil || bErr != nil {
+		return a == b
+	}
+	return aAbs == bAbs
 }
 
 func Empty() *Config {
