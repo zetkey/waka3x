@@ -8,10 +8,62 @@ export function formatDuration(seconds: number): string {
   return `${minutes}m`;
 }
 
-export function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+type DateInput = Date | string | null | undefined;
+
+const isoDateTimePattern = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/;
+const timezoneSuffixPattern = /(?:z|[+-]\d{2}:?\d{2})$/i;
+
+export function parseApiDate(date: DateInput): Date | null {
+  if (!date) return null;
+  if (date instanceof Date) return Number.isNaN(date.getTime()) ? null : date;
+
+  const value = date.trim();
+  if (!value) return null;
+
+  const normalized =
+    isoDateTimePattern.test(value) && !timezoneSuffixPattern.test(value)
+      ? `${value.replace(" ", "T")}Z`
+      : value;
+  const parsed = new Date(normalized);
+
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function formatDate(date: DateInput): string {
+  return (
+    parseApiDate(date)?.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }) ?? "-"
+  );
+}
+
+export function formatDateTime(date: DateInput): string {
+  return (
+    parseApiDate(date)?.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }) ?? "-"
+  );
+}
+
+export function formatTime(date: DateInput): string {
+  return (
+    parseApiDate(date)?.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }) ?? "-"
+  );
+}
+
+export function formatWeekday(date: DateInput): string {
+  return (
+    parseApiDate(date)?.toLocaleDateString("en-US", {
+      weekday: "short",
+    }) ?? "-"
+  );
 }

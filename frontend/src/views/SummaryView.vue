@@ -34,7 +34,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import BarChart from "@/components/charts/BarChart.vue";
 import DoughnutChart from "@/components/charts/DoughnutChart.vue";
 import { useStatsStore } from "@/stores/stats";
-import { formatDuration, formatDate } from "@/lib/formatters";
+import { formatDate, formatDuration, formatTime } from "@/lib/formatters";
 import type {
   SummaryInterval,
   SummaryItem,
@@ -208,12 +208,7 @@ const timelineChartData = computed(() => ({
 const hourlyChartData = computed(() => {
   const groups = details.value?.hourly_breakdown || [];
   const labels = groups.flatMap((group) =>
-    group.items.map((item) =>
-      new Date(item.from_time).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    ),
+    group.items.map((item) => formatTime(item.from_time)),
   );
   const data = groups.flatMap((group) =>
     group.items.map((item) => Math.round((item.duration / 60) * 10) / 10),

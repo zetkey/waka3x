@@ -41,25 +41,22 @@ api_key = defaults-to-this-api-key-when-not-defined-below
 </script>
 
 <template>
-  <div class="min-h-screen bg-background text-foreground">
-    <div class="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <header class="flex items-center justify-between">
+  <div :class="authStore.isAuthenticated ? '' :'min-h-screen bg-background text-foreground'">
+    <div :class="authStore.isAuthenticated ? 'p-4 md:p-8' : 'max-w-4xl mx-auto px-4 py-8'" class="space-y-8">
+      <header v-if="!authStore.isAuthenticated" class="flex items-center justify-between">
         <RouterLink to="/" class="flex items-center gap-2">
           <Rocket class="w-8 h-8 text-primary" />
           <span class="text-2xl font-bold tracking-tight">Waka3x</span>
         </RouterLink>
         <div class="flex gap-2">
-          <RouterLink v-if="authStore.isAuthenticated" to="/dashboard">
-            <Button variant="outline"> Dashboard </Button>
-          </RouterLink>
-          <RouterLink v-else to="/login">
+          <RouterLink to="/login">
             <Button>Log in</Button>
           </RouterLink>
         </div>
       </header>
 
       <section class="space-y-2">
-        <h1 class="text-3xl font-bold">Setup</h1>
+        <h1 class="text-3xl font-bold" :class="authStore.isAuthenticated ? 'tracking-tight text-primary' : ''">Setup</h1>
         <p class="text-muted-foreground">
           Configure WakaTime-compatible clients to send heartbeats to this
           server.

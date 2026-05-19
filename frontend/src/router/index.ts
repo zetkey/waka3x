@@ -13,6 +13,7 @@ declare module "vue-router" {
     requiresAuth?: boolean;
     guestOnly?: boolean;
     requiresAuthWhenLeaderboardPrivate?: boolean;
+    conditionalLayout?: boolean;
   }
 }
 
@@ -41,7 +42,7 @@ const router = createRouter({
       path: "/setup",
       name: "setup",
       component: () => import("../views/SetupView.vue"),
-      meta: { layout: "Landing" },
+      meta: { layout: "Landing", conditionalLayout: true },
     },
     {
       path: "/reset-password",
@@ -90,8 +91,9 @@ const router = createRouter({
       name: "leaderboard",
       component: () => import("../views/LeaderboardView.vue"),
       meta: {
-        layout: "Dashboard",
+        layout: "Landing",
         requiresAuthWhenLeaderboardPrivate: true,
+        conditionalLayout: true,
       },
     },
     {
@@ -138,6 +140,11 @@ function isSafeAuthenticatedRedirect(path: string | undefined): path is string {
 router.beforeEach(async (to) => {
   const authStore = useAuthStore();
   const requiresAuth = await routeRequiresAuth(to);
+
+  if (to.meta.conditionalLayout) {
+    await authStore.fetchUser();
+    to.meta.layout = authStore.isAuthenticated ? "Dashboard" : "Landing";
+  }
 
   if (requiresAuth) {
     await authStore.fetchUser();

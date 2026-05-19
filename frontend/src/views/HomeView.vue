@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useStatsStore } from "@/stores/stats";
-import { formatDate, formatDuration } from "@/lib/formatters";
+import { formatDate, formatDuration, formatWeekday } from "@/lib/formatters";
 import BarChart from "@/components/charts/BarChart.vue";
 import DoughnutChart from "@/components/charts/DoughnutChart.vue";
 import type {
@@ -45,12 +45,6 @@ function toDateInputValue(date: Date) {
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
   const day = `${date.getDate()}`.padStart(2, "0");
   return `${year}-${month}-${day}`;
-}
-
-function formatWeekday(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    weekday: "short",
-  });
 }
 
 function formatHour(hour: number) {
