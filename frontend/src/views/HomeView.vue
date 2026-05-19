@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, watch } from "vue";
 import {
   Activity,
   AppWindow,
@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuthStore } from "@/stores/auth";
 import { useStatsStore } from "@/stores/stats";
 import { formatDate, formatDuration, formatWeekday } from "@/lib/formatters";
 import BarChart from "@/components/charts/BarChart.vue";
@@ -29,41 +30,84 @@ import type {
   TimelineDay,
 } from "@/types/api";
 
+const authStore = useAuthStore();
 const statsStore = useStatsStore();
+const browserTimezone =
+  Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
-function startOfCurrentWeek() {
-  const date = new Date();
-  const day = date.getDay();
-  const daysSinceMonday = (day + 6) % 7;
-  date.setHours(0, 0, 0, 0);
-  date.setDate(date.getDate() - daysSinceMonday);
-  return date;
+function browserSafeTimezone(timeZone: string) {
+  if (!timeZone || timeZone === "Local") return browserTimezone;
+
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone });
+    return timeZone;
+  } catch {
+    return browserTimezone;
+  }
 }
 
-function toDateInputValue(date: Date) {
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
+function datePartsInTimezone(date: Date, timeZone: string) {
+  const safeTimezone = browserSafeTimezone(timeZone);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: safeTimezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).formatToParts(date);
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value || "";
+
+  return {
+    year: Number(get("year")),
+    month: Number(get("month")),
+    day: Number(get("day")),
+    weekday: get("weekday"),
+  };
+}
+
+function dateInputValueInTimezone(date: Date, timeZone: string) {
+  const { year, month, day } = datePartsInTimezone(date, timeZone);
+  return `${year}-${`${month}`.padStart(2, "0")}-${`${day}`.padStart(2, "0")}`;
+}
+
+function startOfCurrentWeek(timeZone: string) {
+  const now = new Date();
+  const parts = datePartsInTimezone(now, timeZone);
+  const weekdayIndex =
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+  const day = weekdayIndex >= 0 ? weekdayIndex : now.getDay();
+  const daysSinceMonday = (day + 6) % 7;
+  const start = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+  start.setUTCDate(start.getUTCDate() - daysSinceMonday);
+  return start;
 }
 
 function formatHour(hour: number) {
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     hour12: true,
-  }).format(new Date(2020, 0, 1, hour));
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(2020, 0, 1, hour)));
 }
 
-const weekStart = startOfCurrentWeek();
-const weekEndExclusive = new Date(weekStart);
-weekEndExclusive.setDate(weekStart.getDate() + 7);
-const weekEndDisplay = new Date(weekEndExclusive);
-weekEndDisplay.setDate(weekEndExclusive.getDate() - 1);
+const userTimezone = computed(() => authStore.user?.location || "Local");
+const weekStart = computed(() => startOfCurrentWeek(userTimezone.value));
+const weekEndExclusive = computed(() => {
+  const date = new Date(weekStart.value);
+  date.setUTCDate(weekStart.value.getUTCDate() + 7);
+  return date;
+});
+const weekEndDisplay = computed(() => {
+  const date = new Date(weekEndExclusive.value);
+  date.setUTCDate(weekEndExclusive.value.getUTCDate() - 1);
+  return date;
+});
 
-const weeklyParams: SummaryRequestParams = {
-  from: toDateInputValue(weekStart),
-  to: toDateInputValue(weekEndExclusive),
-};
+const weeklyParams = computed<SummaryRequestParams>(() => ({
+  from: dateInputValueInTimezone(weekStart.value, userTimezone.value),
+  to: dateInputValueInTimezone(weekEndExclusive.value, userTimezone.value),
+}));
 
 const details = computed(() => statsStore.summaryDetails);
 const summary = computed(() => details.value?.summary || statsStore.summary);
@@ -95,7 +139,11 @@ const mostActiveHour = computed(() => {
 });
 
 const weekLabel = computed(
-  () => `${formatDate(weekStart.toISOString())} - ${formatDate(weekEndDisplay.toISOString())}`,
+  () =>
+    `${formatDate(weekStart.value, userTimezone.value)} - ${formatDate(
+      weekEndDisplay.value,
+      userTimezone.value,
+    )}`,
 );
 
 const reportCards = computed(() => {
@@ -121,7 +169,7 @@ const reportCards = computed(() => {
     },
     {
       label: "Most Active Day",
-      value: day ? formatWeekday(day.date) : "-",
+      value: day ? formatWeekday(day.date, userTimezone.value) : "-",
       description: day ? formatDuration(dayTotal(day)) : "No daily activity",
       icon: CalendarDays,
     },
@@ -180,7 +228,9 @@ const projectChartData = computed(() => ({
 }));
 
 const weekdayChartData = computed(() => ({
-  labels: timeline.value.map((day) => formatWeekday(day.date)),
+  labels: timeline.value.map((day) =>
+    formatWeekday(day.date, userTimezone.value),
+  ),
   datasets: [
     {
       label: "Hours",
@@ -235,9 +285,13 @@ const weeklyTables = computed(() => [
   { title: "Machines", items: top(summary.value?.machines, 6) },
 ]);
 
-onMounted(() => {
-  statsStore.fetchSummaryDetails(weeklyParams).catch(() => undefined);
-});
+watch(
+  weeklyParams,
+  (params) => {
+    statsStore.fetchSummaryDetails(params).catch(() => undefined);
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

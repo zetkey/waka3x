@@ -124,7 +124,7 @@ func (h *SummaryApiHandler) GetDetails(w http.ResponseWriter, r *http.Request) {
 
 	hourlyActivity := []HourlyActivityResponse{}
 	if durations, err := h.durationSrvc.Get(summaryParams.From, summaryParams.To, summaryParams.User, summaryParams.Filters, nil, false); err == nil {
-		hourlyActivity = newHourlyActivityResponse(durations)
+		hourlyActivity = newHourlyActivityResponse(durations, summaryParams.User.TZ())
 	}
 
 	routeutils.RespondJSON(w, http.StatusOK, SummaryDetailsResponse{
@@ -150,10 +150,14 @@ func (h *SummaryApiHandler) GetDetails(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func newHourlyActivityResponse(durations models.Durations) []HourlyActivityResponse {
+func newHourlyActivityResponse(durations models.Durations, tz *time.Location) []HourlyActivityResponse {
+	if tz == nil {
+		tz = time.Local
+	}
+
 	totals := make([]int64, 24)
 	for _, duration := range durations {
-		totals[duration.Time.T().Hour()] += int64(duration.Duration / time.Second)
+		totals[duration.Time.T().In(tz).Hour()] += int64(duration.Duration / time.Second)
 	}
 
 	response := make([]HourlyActivityResponse, 0, len(totals))

@@ -31,6 +31,7 @@ const authStore = useAuthStore();
 
 const details = computed(() => statsStore.leaderboardDetails);
 const topKeys = computed(() => details.value?.top_keys || []);
+const userTimezone = computed(() => authStore.user?.location || "Local");
 
 function fetchLeaderboard() {
   statsStore.fetchLeaderboard({
@@ -201,7 +202,7 @@ onMounted(fetchLeaderboard);
       >
         <span
           >Last updated:
-          {{ formatDateTime(details?.last_updated) }}</span
+          {{ formatDateTime(details?.last_updated, userTimezone) }}</span
         >
         <div class="flex items-center gap-2">
           <Button

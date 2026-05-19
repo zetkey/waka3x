@@ -33,6 +33,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import BarChart from "@/components/charts/BarChart.vue";
 import DoughnutChart from "@/components/charts/DoughnutChart.vue";
+import { useAuthStore } from "@/stores/auth";
 import { useStatsStore } from "@/stores/stats";
 import { formatDate, formatDuration, formatTime } from "@/lib/formatters";
 import type {
@@ -41,6 +42,7 @@ import type {
   SummaryRequestParams,
 } from "@/types/api";
 
+const authStore = useAuthStore();
 const statsStore = useStatsStore();
 const route = useRoute();
 const router = useRouter();
@@ -73,6 +75,7 @@ const filters = reactive({
 
 const details = computed(() => statsStore.summaryDetails);
 const summary = computed(() => details.value?.summary || statsStore.summary);
+const userTimezone = computed(() => authStore.user?.location || "Local");
 const totalSeconds = computed(
   () => summary.value?.projects.reduce((acc, p) => acc + p.total, 0) || 0,
 );
@@ -124,7 +127,7 @@ const kpis = computed(() => {
       label: "Total Time",
       value: formatDuration(totalSeconds.value),
       icon: Clock,
-      sub: `from ${formatDate(s.from)}`,
+      sub: `from ${formatDate(s.from, userTimezone.value)}`,
     },
     {
       label: "Active Projects",
@@ -187,7 +190,10 @@ const editorChartData = computed(() => ({
 }));
 
 const timelineChartData = computed(() => ({
-  labels: details.value?.timeline?.map((day) => formatDate(day.date)) || [],
+  labels:
+    details.value?.timeline?.map((day) =>
+      formatDate(day.date, userTimezone.value),
+    ) || [],
   datasets: [
     {
       label: "Hours",
@@ -208,7 +214,7 @@ const timelineChartData = computed(() => ({
 const hourlyChartData = computed(() => {
   const groups = details.value?.hourly_breakdown || [];
   const labels = groups.flatMap((group) =>
-    group.items.map((item) => formatTime(item.from_time)),
+    group.items.map((item) => formatTime(item.from_time, userTimezone.value)),
   );
   const data = groups.flatMap((group) =>
     group.items.map((item) => Math.round((item.duration / 60) * 10) / 10),
@@ -279,8 +285,8 @@ onMounted(syncRouteAndFetch);
             {{ details?.project_details ? details.project : "Summary" }}
           </h1>
           <p class="text-muted-foreground text-sm">
-            Activity from {{ formatDate(summary?.from || "") }} to
-            {{ formatDate(summary?.to || "") }}
+            Activity from {{ formatDate(summary?.from || "", userTimezone) }} to
+            {{ formatDate(summary?.to || "", userTimezone) }}
           </p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">

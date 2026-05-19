@@ -35,6 +35,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -55,6 +56,12 @@ const browserTimezone =
   Intl.DateTimeFormat().resolvedOptions().timeZone || "Local";
 const settings = computed(() => settingsStore.settings);
 const githubReadmeStatsDefaultUrl = "https://github-readme-stats.vercel.app";
+const supportedTimezones =
+  (
+    Intl as typeof Intl & {
+      supportedValuesOf?: (key: "timeZone") => string[];
+    }
+  ).supportedValuesOf?.("timeZone") || [];
 
 const weekDays = [
   { label: "Sunday", value: 0 },
@@ -90,6 +97,24 @@ const profileForm = reactive({
   location: browserTimezone,
   reports_weekly: false,
   start_of_week: 1,
+});
+const timezoneOptions = computed(() => {
+  return Array.from(
+    new Set([
+      browserTimezone,
+      "Local",
+      profileForm.location,
+      ...supportedTimezones,
+    ]),
+  )
+    .filter(Boolean)
+    .sort((a, b) => {
+      if (a === browserTimezone) return -1;
+      if (b === browserTimezone) return 1;
+      if (a === "Local") return -1;
+      if (b === "Local") return 1;
+      return a.localeCompare(b);
+    });
 });
 const passwordForm = reactive({
   password_old: "",
@@ -417,7 +442,26 @@ async function disconnectWakatime() {
               </div>
               <div class="space-y-2">
                 <Label>Timezone</Label>
-                <Input v-model="profileForm.location" />
+                <Select v-model="profileForm.location">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select timezone" />
+                  </SelectTrigger>
+                  <SelectContent class="max-h-80">
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="timezone in timezoneOptions"
+                        :key="timezone"
+                        :value="timezone"
+                      >
+                        {{
+                          timezone === browserTimezone
+                            ? `${timezone} (browser)`
+                            : timezone
+                        }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
               <div class="space-y-2">
                 <Label>Start of week</Label>

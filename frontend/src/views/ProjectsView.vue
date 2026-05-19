@@ -9,10 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuthStore } from "@/stores/auth";
 import { Input } from "@/components/ui/input";
 import { useStatsStore } from "@/stores/stats";
 import { formatDate } from "@/lib/formatters";
 
+const authStore = useAuthStore();
 const statsStore = useStatsStore();
 const searchQuery = ref("");
 const page = ref(1);
@@ -102,9 +104,13 @@ onMounted(fetchProjects);
             <div
               class="flex items-center gap-2 text-xs text-muted-foreground font-mono"
             >
-              <span>{{ formatDate(project.first_heartbeat) }}</span>
+              <span>{{
+                formatDate(project.first_heartbeat, authStore.user?.location)
+              }}</span>
               <span>→</span>
-              <span>{{ formatDate(project.last_heartbeat) }}</span>
+              <span>{{
+                formatDate(project.last_heartbeat, authStore.user?.location)
+              }}</span>
             </div>
           </CardContent>
           <div

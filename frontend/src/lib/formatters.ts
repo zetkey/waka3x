@@ -29,41 +29,79 @@ export function parseApiDate(date: DateInput): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-export function formatDate(date: DateInput): string {
+function localeOptions(
+  options: Intl.DateTimeFormatOptions,
+  timeZone?: string,
+): Intl.DateTimeFormatOptions {
+  if (!timeZone || timeZone === "Local") return options;
+
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone });
+    return { ...options, timeZone };
+  } catch {
+    return options;
+  }
+}
+
+export function formatDate(date: DateInput, timeZone?: string): string {
   return (
-    parseApiDate(date)?.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }) ?? "-"
+    parseApiDate(date)?.toLocaleDateString(
+      "en-US",
+      localeOptions(
+        {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        },
+        timeZone,
+      ),
+    ) ?? "-"
   );
 }
 
-export function formatDateTime(date: DateInput): string {
+export function formatDateTime(date: DateInput, timeZone?: string): string {
   return (
-    parseApiDate(date)?.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }) ?? "-"
+    parseApiDate(date)?.toLocaleString(
+      "en-US",
+      localeOptions(
+        {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+        timeZone,
+      ),
+    ) ?? "-"
   );
 }
 
-export function formatTime(date: DateInput): string {
+export function formatTime(date: DateInput, timeZone?: string): string {
   return (
-    parseApiDate(date)?.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }) ?? "-"
+    parseApiDate(date)?.toLocaleTimeString(
+      [],
+      localeOptions(
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+        timeZone,
+      ),
+    ) ?? "-"
   );
 }
 
-export function formatWeekday(date: DateInput): string {
+export function formatWeekday(date: DateInput, timeZone?: string): string {
   return (
-    parseApiDate(date)?.toLocaleDateString("en-US", {
-      weekday: "short",
-    }) ?? "-"
+    parseApiDate(date)?.toLocaleDateString(
+      "en-US",
+      localeOptions(
+        {
+          weekday: "short",
+        },
+        timeZone,
+      ),
+    ) ?? "-"
   );
 }
