@@ -133,3 +133,131 @@ func (suite *UserServiceTestSuite) TestUserService_GetByKeyFromAdditionalApiKeys
 	suite.NotNil(err)
 	suite.Equal(err, errors.New("not found"))
 }
+
+func (suite *UserServiceTestSuite) TestUserService_GetUserById_Empty() {
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+
+	result, err := sut.GetUserById("")
+
+	suite.Nil(result)
+	suite.NotNil(err)
+	suite.Equal(err, errors.New("user id must not be empty"))
+}
+
+func (suite *UserServiceTestSuite) TestUserService_GetUserById_FromCache() {
+	userCached := &models.User{ID: TestUserID, ApiKey: "cached-key"}
+
+	userCache := cache.New(cache.NoExpiration, cache.NoExpiration)
+	userCache.SetDefault(TestUserID, userCached)
+
+	sut := &UserService{cache: userCache}
+
+	result, err := sut.GetUserById(TestUserID)
+	suite.Nil(err)
+	suite.NotNil(result)
+	suite.Equal(userCached, result)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_GetUserById_FromRepo() {
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+
+	suite.UserRepo.On("FindOne", models.User{ID: TestUserID}).Return(suite.TestUser, nil)
+
+	result, err := sut.GetUserById(TestUserID)
+	suite.Nil(err)
+	suite.NotNil(result)
+	suite.Equal(suite.TestUser, result)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_GetUserByWebAuthnID_Empty() {
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+
+	result, err := sut.GetUserByWebAuthnID("")
+
+	suite.Nil(result)
+	suite.NotNil(err)
+	suite.Equal(err, errors.New("webauthn id must not be empty"))
+}
+
+func (suite *UserServiceTestSuite) TestUserService_GetUserByWebAuthnID_Valid() {
+	const testWebAuthnID = "test-webauthn-id"
+
+	suite.UserRepo.On("FindOne", models.User{WebauthnID: testWebAuthnID}).Return(suite.TestUser, nil)
+
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+	result, err := sut.GetUserByWebAuthnID(testWebAuthnID)
+
+	suite.Equal(suite.TestUser, result)
+	suite.Nil(err)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_GetUserByResetToken_Empty() {
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+
+	result, err := sut.GetUserByResetToken("")
+
+	suite.Nil(result)
+	suite.NotNil(err)
+	suite.Equal(err, errors.New("reset token must not be empty"))
+}
+
+func (suite *UserServiceTestSuite) TestUserService_GetUserByResetToken_Valid() {
+	const testResetToken = "test-reset-token"
+
+	suite.UserRepo.On("FindOne", models.User{ResetToken: testResetToken}).Return(suite.TestUser, nil)
+
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+	result, err := sut.GetUserByResetToken(testResetToken)
+
+	suite.Equal(suite.TestUser, result)
+	suite.Nil(err)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_CreateOrGet_NewUser() {
+	signup := &models.Signup{
+		Username: "newuser",
+		Email:    "new@example.com",
+		Password: "password123",
+		Location: "US/Pacific",
+	}
+
+	suite.UserRepo.On("InsertOrGet", &models.User{
+		ID:       signup.Username,
+		Email:    signup.Email,
+		Location: signup.Location,
+		Password: signup.Password,
+	}).Return(suite.TestUser, true, nil)
+
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+	result, created, err := sut.CreateOrGet(signup, false)
+
+	suite.Nil(err)
+	suite.NotNil(result)
+	suite.True(created)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_Update_Success() {
+	updatedUser := &models.User{ID: TestUserID, Email: "updated@example.com"}
+
+	suite.UserRepo.On("Update", suite.TestUser).Return(updatedUser, nil)
+
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+	result, err := sut.Update(suite.TestUser)
+
+	suite.Nil(err)
+	suite.NotNil(result)
+	suite.Equal(updatedUser, result)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_ResetApiKey_Success() {
+	updatedUser := &models.User{ID: TestUserID, ApiKey: "new-api-key"}
+
+	suite.UserRepo.On("Update", suite.TestUser).Return(updatedUser, nil)
+
+	sut := NewUserService(suite.KeyValueService, suite.MailService, suite.ApiKeyService, suite.UserRepo)
+	result, err := sut.ResetApiKey(suite.TestUser)
+
+	suite.Nil(err)
+	suite.NotNil(result)
+	suite.NotEqual(TestAPIKey, result.ApiKey)
+}

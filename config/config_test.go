@@ -133,6 +133,113 @@ func (suite *ConfigTestSuite) TestLoadWaka3xSecretFileAlias() {
 	suite.Equal("secret-from-file", cfg.Security.PasswordSalt)
 }
 
+func (suite *ConfigTestSuite) TestResolveConfigFilesLayersDefaultsConfigAndLocal() {
+	dir := suite.T().TempDir()
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, DefaultConfigReferencePath), []byte("env: production\n"), 0600))
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, DefaultConfigPath), []byte("env: staging\n"), 0600))
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, LocalConfigPath), []byte("env: local\n"), 0600))
+
+	cwd, err := os.Getwd()
+	suite.Require().NoError(err)
+	suite.Require().NoError(os.Chdir(dir))
+	defer os.Chdir(cwd)
+
+	suite.Equal([]string{LocalConfigPath, DefaultConfigPath, DefaultConfigReferencePath}, resolveConfigFiles(DefaultConfigPath))
+}
+
+func (suite *ConfigTestSuite) TestLoadSparseConfigKeepsDefaultReferenceValues() {
+	dir := suite.T().TempDir()
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, DefaultConfigReferencePath), []byte(`
+env: production
+server:
+  listen_ipv4: 127.0.0.1
+  listen_ipv6: ::1
+  public_url: http://localhost:3000
+app:
+  heartbeat_max_age: 4320h
+  date_format: Mon, 02 Jan 2006
+  datetime_format: Mon, 02 Jan 2006 15:04
+  leaderboard_scope: 7_days
+  aggregation_time: '0 15 2 * * *'
+  report_time_weekly: '0 0 18 * * 5'
+  leaderboard_generation_time: '0 0 6 * * *,0 0 18 * * *'
+db:
+  dialect: sqlite3
+  name: waka3x.db
+  max_conn: 10
+mail:
+  provider: smtp
+security:
+  insecure_cookies: true
+`), 0600))
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, DefaultConfigPath), []byte(`
+server:
+  public_url: https://waka3x.example
+security:
+  password_salt: private-salt
+`), 0600))
+
+	cwd, err := os.Getwd()
+	suite.Require().NoError(err)
+	suite.Require().NoError(os.Chdir(dir))
+	defer os.Chdir(cwd)
+
+	cfg := Load(DefaultConfigPath, "")
+
+	suite.Equal("127.0.0.1", cfg.Server.ListenIpV4)
+	suite.Equal("::1", cfg.Server.ListenIpV6)
+	suite.Equal("https://waka3x.example", cfg.Server.PublicUrl)
+	suite.Equal("private-salt", cfg.Security.PasswordSalt)
+	suite.Equal("4320h", cfg.App.HeartbeatMaxAge)
+}
+
+func (suite *ConfigTestSuite) TestLocalConfigOverridesExplicitConfig() {
+	dir := suite.T().TempDir()
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, DefaultConfigReferencePath), []byte(`
+env: production
+server:
+  listen_ipv4: 127.0.0.1
+  listen_ipv6: ::1
+  public_url: http://localhost:3000
+app:
+  heartbeat_max_age: 4320h
+  date_format: Mon, 02 Jan 2006
+  datetime_format: Mon, 02 Jan 2006 15:04
+  leaderboard_scope: 7_days
+  aggregation_time: '0 15 2 * * *'
+  report_time_weekly: '0 0 18 * * 5'
+  leaderboard_generation_time: '0 0 6 * * *,0 0 18 * * *'
+db:
+  dialect: sqlite3
+  name: waka3x.db
+  max_conn: 10
+mail:
+  provider: smtp
+security:
+  insecure_cookies: true
+`), 0600))
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, DefaultConfigPath), []byte(`
+server:
+  public_url: https://config.example
+`), 0600))
+	suite.Require().NoError(os.WriteFile(filepath.Join(dir, LocalConfigPath), []byte(`
+server:
+  public_url: https://local.example
+security:
+  password_salt: local-salt
+`), 0600))
+
+	cwd, err := os.Getwd()
+	suite.Require().NoError(err)
+	suite.Require().NoError(os.Chdir(dir))
+	defer os.Chdir(cwd)
+
+	cfg := Load(DefaultConfigPath, "")
+
+	suite.Equal("https://local.example", cfg.Server.PublicUrl)
+	suite.Equal("local-salt", cfg.Security.PasswordSalt)
+}
+
 func (suite *ConfigTestSuite) TestOidcProviderConfigValidate() {
 	testCases := []struct {
 		name   string
