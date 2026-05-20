@@ -151,6 +151,18 @@ const newPasskeyName = ref("");
 const inviteLink = ref("");
 const vibrantColorsEnabled = ref(false);
 
+const aliasTypes = [
+  { label: "Project", value: 0 },
+  { label: "Language", value: 1 },
+  { label: "Editor", value: 2 },
+  { label: "OS", value: 3 },
+  { label: "Machine", value: 4 },
+];
+
+function aliasTypeLabel(type: number) {
+  return aliasTypes.find((t) => t.value === type)?.label || "Unknown";
+}
+
 function trimTrailingSlashes(value: string) {
   return value.replace(/\/+$/, "");
 }
@@ -690,11 +702,12 @@ async function disconnectWakatime() {
               <Select v-model="newAlias.type">
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem :value="0">Project</SelectItem>
-                  <SelectItem :value="1">Language</SelectItem>
-                  <SelectItem :value="2">Editor</SelectItem>
-                  <SelectItem :value="3">OS</SelectItem>
-                  <SelectItem :value="4">Machine</SelectItem>
+                  <SelectItem
+                    v-for="option in aliasTypes"
+                    :key="option.value"
+                    :value="option.value"
+                    >{{ option.label }}</SelectItem
+                  >
                 </SelectContent>
               </Select>
               <Input v-model="newAlias.key" placeholder="Canonical key" />
@@ -715,7 +728,14 @@ async function disconnectWakatime() {
                 class="rounded-md border p-2 text-xs"
               >
                 <div class="flex justify-between gap-2">
-                  <span class="font-semibold">{{ alias.key }}</span>
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                    >
+                      {{ aliasTypeLabel(alias.type) }}
+                    </span>
+                    <span class="font-semibold">{{ alias.key }}</span>
+                  </div>
                   <button
                     class="text-destructive"
                     @click="

@@ -7,6 +7,7 @@ import (
 
 	"github.com/becheran/wildmatch-go"
 	datastructure "github.com/duke-git/lancet/v2/datastructure/set"
+	"github.com/leandro-lugaresi/hub"
 	"github.com/zetkey/waka3x/config"
 	"github.com/zetkey/waka3x/models"
 	"github.com/zetkey/waka3x/repositories"
@@ -14,12 +15,14 @@ import (
 
 type AliasService struct {
 	config     *config.Config
+	eventBus   *hub.Hub
 	repository repositories.IAliasRepository
 }
 
 func NewAliasService(aliasRepo repositories.IAliasRepository) *AliasService {
 	return &AliasService{
 		config:     config.Get(),
+		eventBus:   config.EventBus(),
 		repository: aliasRepo,
 	}
 }
@@ -107,6 +110,7 @@ func (srv *AliasService) Create(alias *models.Alias) (*models.Alias, error) {
 	// reload entire cache (async, though)
 	go srv.MayInitializeUser(alias.UserID)
 
+	srv.notifyUpdate(alias, false)
 	return result, nil
 }
 
@@ -119,6 +123,7 @@ func (srv *AliasService) Delete(alias *models.Alias) error {
 	// manually update cache
 	if err == nil {
 		srv.updateCache(alias, false)
+		srv.notifyUpdate(alias, true)
 	}
 	// reload entire cache (async, though)
 	go srv.MayInitializeUser(alias.UserID)
@@ -144,6 +149,7 @@ func (srv *AliasService) DeleteMulti(aliases []*models.Alias) error {
 	if err == nil {
 		for _, a := range aliases {
 			srv.updateCache(a, true)
+			srv.notifyUpdate(a, true)
 		}
 	}
 	// reload entire cache (async, though)
@@ -152,6 +158,17 @@ func (srv *AliasService) DeleteMulti(aliases []*models.Alias) error {
 	}
 
 	return err
+}
+
+func (srv *AliasService) notifyUpdate(alias *models.Alias, isDelete bool) {
+	name := config.EventAliasCreate
+	if isDelete {
+		name = config.EventAliasDelete
+	}
+	srv.eventBus.Publish(hub.Message{
+		Name:   name,
+		Fields: map[string]interface{}{config.FieldPayload: alias, config.FieldUserId: alias.UserID},
+	})
 }
 
 func (srv *AliasService) updateCache(reason *models.Alias, removal bool) {

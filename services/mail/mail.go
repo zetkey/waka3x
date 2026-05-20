@@ -39,7 +39,7 @@ type MailService struct {
 	templates      utils.TemplateMap
 }
 
-func NewMailService() services.IMailService {
+func NewMailService() (services.IMailService, error) {
 	config := conf.Get()
 
 	var sendingService SendingService
@@ -55,10 +55,10 @@ func NewMailService() services.IMailService {
 	templateFS := conf.ChooseFS("services/mail/templates", templates.TemplateFiles)
 	loadedTemplates, err := utils.LoadTemplates(templateFS, defaultTemplateFuncs())
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to load email templates: %w", err)
 	}
 
-	return &MailService{sendingService: sendingService, config: config, templates: loadedTemplates}
+	return &MailService{sendingService: sendingService, config: config, templates: loadedTemplates}, nil
 }
 
 func (m *MailService) SendPasswordReset(recipient *models.User, resetLink string) error {

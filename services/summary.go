@@ -14,11 +14,11 @@ import (
 	"github.com/duke-git/lancet/v2/datetime"
 	"github.com/duke-git/lancet/v2/slice"
 	"github.com/leandro-lugaresi/hub"
+	"github.com/patrickmn/go-cache"
 	"github.com/zetkey/waka3x/config"
 	"github.com/zetkey/waka3x/models"
 	"github.com/zetkey/waka3x/models/types"
 	"github.com/zetkey/waka3x/repositories"
-	"github.com/patrickmn/go-cache"
 )
 
 type SummaryService struct {
@@ -52,6 +52,13 @@ func NewSummaryService(summaryRepo repositories.ISummaryRepository, heartbeatSer
 			srv.invalidateUserCache(m.Fields[config.FieldUserId].(string))
 		}
 	}(&sub1)
+
+	sub3 := srv.eventBus.Subscribe(0, config.TopicAlias) // published from alias service
+	go func(sub *hub.Subscription) {
+		for m := range sub.Receiver {
+			srv.invalidateUserCache(m.Fields[config.FieldUserId].(string))
+		}
+	}(&sub3)
 
 	sub2 := srv.eventBus.Subscribe(0, config.EventHeartbeatCreate)
 	go func(sub *hub.Subscription) {
@@ -469,7 +476,7 @@ func (srv *SummaryService) mergeSummaryItems(existing []*models.SummaryItem, new
 
 func (srv *SummaryService) getMissingIntervals(from, to time.Time, summaries []*models.Summary, precise bool) []*models.Interval {
 	if len(summaries) == 0 {
-		return []*models.Interval{{from, to}}
+		return []*models.Interval{{Start: from, End: to}}
 	}
 
 	intervals := make([]*models.Interval, 0)

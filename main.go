@@ -184,7 +184,10 @@ func main() {
 	webAuthnRepository = repositories.NewWebAuthnRepository(db)
 
 	// Services
-	mailService = mail.NewMailService()
+	mailService, err = mail.NewMailService()
+	if err != nil {
+		conf.Log().Fatal("failed to initialize mail service", "error", err)
+	}
 	aliasService = services.NewAliasService(aliasRepository)
 	keyValueService = services.NewKeyValueService(keyValueRepository)
 	apiKeyService = services.NewApiKeyService(apiKeyRepository)
